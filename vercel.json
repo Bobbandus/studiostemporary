@@ -4,6 +4,6 @@
     { "src": "*.html", "use": "@vercel/static" }
   ],
   "routes": [
-    { "src": "/", "dest": "/aplus-studios.html" }
+    { "src": "/", "dest": "/index.html" }
   ]
 }
