@@ -1,0 +1,20 @@
+{
+  "routes": [
+    {
+      "src": "/",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/om-oss",
+      "dest": "/om-oss.html"
+    },
+    {
+      "src": "/projekt",
+      "dest": "/projekt.html"
+    },
+    {
+      "src": "/utrustning",
+      "dest": "/utrustning.html"
+    }
+  ]
+}
