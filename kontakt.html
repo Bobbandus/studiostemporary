@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kontakt | A+ Studios</title>
+<meta name="description" content="Vill du göra film, musik, spel eller en livesändning med A+ Studios? Hör av dig.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=Archivo+Black&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+
+<header class="site-header">
+  <a href="index.html" class="brand" aria-label="A+ Studios, till startsidan">
+    <span class="brand-mark">A<span class="plus">+</span></span>
+  </a>
+  <nav class="main-nav" id="mainNav">
+    <a href="index.html" data-i18n="nav.home">Hem</a>
+    <a href="om-oss.html" data-i18n="nav.about">Om oss</a>
+    <a href="projekt.html" data-i18n="nav.projects">Projekt</a>
+    <a href="utrustning.html" data-i18n="nav.gear">Utrustning</a>
+    <a href="anlita.html" data-i18n="nav.hire">Anlita</a>
+    <a href="kontakt.html" class="nav-cta active" data-i18n="nav.contact">Kontakt</a>
+  </nav>
+  <div class="header-controls">
+    <button class="lang-toggle" id="langToggle" aria-label="Byt språk / Switch language">
+      <span class="lang-sv">SV</span><span class="lang-sep">/</span><span class="lang-en">EN</span>
+    </button>
+    <button class="menu-toggle" id="menuToggle" aria-label="Meny" aria-expanded="false" aria-controls="mainNav">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main>
+
+  <section class="pbanner">
+    <div class="pbanner-bg" style="background-image:url('jonathan1-chase.jpg')"></div>
+    <div class="pbanner-mid" aria-hidden="true"></div>
+    <div class="pbanner-scrim"></div>
+    <div class="pbanner-fg">
+      <p class="pbanner-kicker" data-i18n="nav.contact">Kontakt</p>
+      <h1 data-i18n="contact.heading">Vill du göra något med oss?</h1>
+      <p class="pbanner-sub" data-i18n="contact.body">Film, musik, spel eller en livesändning som faktiskt fungerar. Hör av dig så pratar vi om vad det skulle kunna bli.</p>
+    </div>
+  </section>
+
+  <section class="contact contact--strip">
+    <div class="contact-inner">
+      <a href="mailto:hej@aplusfilm.se" class="btn btn-primary btn-lg" data-i18n="contact.cta">Maila oss</a>
+      <p class="contact-alt" data-i18n="contact.alt">hej@aplusfilm.se</p>
+
+      <p class="contact-social-head" data-i18n="contact.social">Sociala medier &amp; kanaler</p>
+      <ul class="contact-links">
+        <li>
+          <span class="cl-label" data-edit="cl.tiktok">TikTok</span>
+          <a href="https://www.tiktok.com/@aplus.studios" target="_blank" rel="noopener">@aplus.studios →</a>
+        </li>
+        <li>
+          <span class="cl-label" data-edit="cl.tiktokbob">TikTok (Bob)</span>
+          <a href="https://www.tiktok.com/@bobbanspelar" target="_blank" rel="noopener">@bobbanspelar →</a>
+        </li>
+        <li>
+          <span class="cl-label" data-edit="cl.youtube">YouTube</span>
+          <a href="https://www.youtube.com/@A-plus-studios" target="_blank" rel="noopener">@A-plus-studios →</a>
+        </li>
+        <li>
+          <span class="cl-label" data-edit="cl.jaderwaveyt">YouTube (Jaderwave)</span>
+          <a href="https://www.youtube.com/channel/UCHTT0qq7BC7B_AkdogLiZLQ" target="_blank" rel="noopener">Jaderwave →</a>
+        </li>
+        <li>
+          <span class="cl-label" data-edit="cl.spotify">Spotify</span>
+          <a href="https://open.spotify.com/search/Jaderwave" target="_blank" rel="noopener">Jaderwave →</a>
+        </li>
+        <li>
+          <span class="cl-label" data-edit="cl.noom">Noomaraton-filmer</span>
+          <a href="https://www.youtube.com/@NickeLurig" target="_blank" rel="noopener">@NickeLurig →</a>
+        </li>
+        <li>
+          <span class="cl-label" data-edit="cl.discord">Discord</span>
+          <span class="cl-soon" data-i18n="community.soon">Kommer snart</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <span class="brand-mark small">A<span class="plus">+</span></span>
+  <p data-i18n="footer.text">© 2026 A+ Studios, Alingsås.</p>
+  <div class="footer-links">
+    <a href="https://www.tiktok.com/@aplus.studios" target="_blank" rel="noopener">TikTok</a>
+    <a href="https://www.youtube.com/@A-plus-studios" target="_blank" rel="noopener">YouTube</a>
+    <a href="mailto:hej@aplusfilm.se">Mail</a>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Om oss | A+ Studios</title>
+<meta name="description" content="A+ Studios grundades 2021 i Alingsås. Läs historien, se tidslinjen och följ studion på sociala medier.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=Archivo+Black&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+
+<header class="site-header">
+  <a href="index.html" class="brand" aria-label="A+ Studios, till startsidan">
+    <span class="brand-mark">A<span class="plus">+</span></span>
+  </a>
+  <nav class="main-nav" id="mainNav">
+    <a href="index.html" data-i18n="nav.home">Hem</a>
+    <a href="om-oss.html" class="active" data-i18n="nav.about">Om oss</a>
+    <a href="projekt.html" data-i18n="nav.projects">Projekt</a>
+    <a href="utrustning.html" data-i18n="nav.gear">Utrustning</a>
+    <a href="anlita.html" data-i18n="nav.hire">Anlita</a>
+    <a href="kontakt.html" class="nav-cta" data-i18n="nav.contact">Kontakt</a>
+  </nav>
+  <div class="header-controls">
+    <button class="lang-toggle" id="langToggle" aria-label="Byt språk / Switch language">
+      <span class="lang-sv">SV</span><span class="lang-sep">/</span><span class="lang-en">EN</span>
+    </button>
+    <button class="menu-toggle" id="menuToggle" aria-label="Meny" aria-expanded="false" aria-controls="mainNav">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main>
+
+  <section class="pbanner">
+    <div class="pbanner-bg" style="background-image:url('jonathan2-run.png')"></div>
+    <div class="pbanner-mid" aria-hidden="true"></div>
+    <div class="pbanner-scrim"></div>
+    <div class="pbanner-fg">
+      <p class="pbanner-kicker" data-i18n="nav.about">Om oss</p>
+      <h1 data-i18n="story.heading">Från skolkorridoren till skärmen.</h1>
+      <p class="pbanner-sub" data-i18n="story.location">Alingsås, Sverige</p>
+    </div>
+  </section>
+
+  <section class="story">
+    <div class="story-inner">
+      <p class="story-body" data-i18n="story.body">A+ Studios startade 2021 under namnet Brk Film. Ett gäng med en kamera, för mycket idéer och noll färdiga svar. 2025 bytte vi namn till A+ Studios och klev in i spelutveckling också. Vi är fortfarande högstadieelever som gör det här mellan lektioner och läxor, men vi ställer samma krav på oss själva som vilket produktionsbolag som helst.</p>
+
+      <ol class="timeline">
+        <li><span class="tl-year" data-edit="tl.year1">2021</span><span class="tl-text" data-i18n="story.tl1">Brk Film grundas av Bob Jäderberg.</span></li>
+        <li><span class="tl-year" data-edit="tl.year_live">2024</span><span class="tl-text" data-i18n="story.tl_live">Vi börjar sända live. Multikameraproduktion i realtid.</span></li>
+        <li><span class="tl-year" data-edit="tl.year2">2025</span><span class="tl-text" data-i18n="story.tl2">Namnbyte till A+ Studios. Spelutveckling blir det fjärde benet.</span></li>
+        <li><span class="tl-year" data-edit="tl.year3">2026</span><span class="tl-text" data-i18n="story.tl3">Jonathan I & II, två Noomaraton-bidrag och MAYDAY. Allt samma år.</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ===== COMMUNITY ===== -->
+  <section class="community" id="community">
+    <h2 data-i18n="community.heading">Följ med.</h2>
+    <div class="community-grid">
+      <div class="community-card">
+        <img src="tiktok-followers.png" alt="A+ Studios TikTok-profil: 1 272 följare" class="tiktok-shot" loading="lazy">
+        <p data-i18n="community.tiktok">Över 1 200 följare på TikTok, och det växer.</p>
+        <a href="https://www.tiktok.com/@aplus.studios" target="_blank" rel="noopener" class="text-link" data-i18n="community.tiktokcta">Följ @aplus.studios →</a>
+      </div>
+      <div class="community-card">
+        <p class="community-title" data-i18n="community.foundertitle">Bakom kulisserna</p>
+        <p data-i18n="community.founder">Grundaren Bob delar processen, misstagen och allt som inte kommer med i den färdiga filmen.</p>
+        <a href="https://www.tiktok.com/@bobbanspelar" target="_blank" rel="noopener" class="text-link" data-i18n="community.foundercta">Följ Bob @bobbanspelar →</a>
+      </div>
+      <div class="community-card">
+        <p class="community-title" data-i18n="community.yttitle">Allt filmiskt</p>
+        <p data-i18n="community.yt">A+ Studios officiella kanal. Inkluderar Jonathan 1 och 2. Noomaraton-bidrag innan 2026 finns inte på denna kanal.</p>
+        <a href="https://www.youtube.com/@A-plus-studios" target="_blank" rel="noopener" class="text-link" data-i18n="community.ytcta">Se kanalen →</a>
+      </div>
+      <div class="community-card community-card--soon">
+        <p class="community-title" data-i18n="community.discordtitle">Discord</p>
+        <p data-i18n="community.discord">Planeras att släppas efter att nya projekt har släppts.</p>
+        <span class="soon-badge" data-i18n="community.soon">Kommer snart</span>
+      </div>
+    </div>
+
+    <div class="page-link-strip">
+      <p data-i18n="home.morelink2">Vill du se vad vi faktiskt bygger?</p>
+      <a href="projekt.html" class="btn btn-ghost" data-i18n="home.moreprojects">Alla projekt →</a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <span class="brand-mark small">A<span class="plus">+</span></span>
+  <p data-i18n="footer.text">© 2026 A+ Studios, Alingsås.</p>
+  <div class="footer-links">
+    <a href="https://www.tiktok.com/@aplus.studios" target="_blank" rel="noopener">TikTok</a>
+    <a href="https://www.youtube.com/@A-plus-studios" target="_blank" rel="noopener">YouTube</a>
+    <a href="mailto:hej@aplusfilm.se">Mail</a>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

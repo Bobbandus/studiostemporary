@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anlita | A+ Studios</title>
+<meta name="description" content="Vad A+ Studios kan göra för dig och vad det kostar ungefär. Livesändning, filmning, musik och spelutveckling. Plus öppna roller och casting.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=Archivo+Black&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+
+<header class="site-header">
+  <a href="index.html" class="brand" aria-label="A+ Studios, till startsidan">
+    <span class="brand-mark">A<span class="plus">+</span></span>
+  </a>
+  <nav class="main-nav" id="mainNav">
+    <a href="index.html" data-i18n="nav.home">Hem</a>
+    <a href="om-oss.html" data-i18n="nav.about">Om oss</a>
+    <a href="projekt.html" data-i18n="nav.projects">Projekt</a>
+    <a href="utrustning.html" data-i18n="nav.gear">Utrustning</a>
+    <a href="anlita.html" class="active" data-i18n="nav.hire">Anlita</a>
+    <a href="kontakt.html" class="nav-cta" data-i18n="nav.contact">Kontakt</a>
+  </nav>
+  <div class="header-controls">
+    <button class="lang-toggle" id="langToggle" aria-label="Byt språk / Switch language">
+      <span class="lang-sv">SV</span><span class="lang-sep">/</span><span class="lang-en">EN</span>
+    </button>
+    <button class="menu-toggle" id="menuToggle" aria-label="Meny" aria-expanded="false" aria-controls="mainNav">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main>
+
+  <section class="pbanner">
+    <div class="pbanner-bg" style="background-image:url('jonathan2-kitchen.png')"></div>
+    <div class="pbanner-mid" aria-hidden="true"></div>
+    <div class="pbanner-scrim"></div>
+    <div class="pbanner-fg">
+      <p class="pbanner-kicker" data-i18n="nav.hire">Anlita</p>
+      <h1 data-i18n="hire.h1">Jobba med oss.</h1>
+      <p class="pbanner-sub" data-i18n="hire.sub">Film, musik, spel eller livesändning. Här är vad vi gör och vad det kostar ungefär.</p>
+    </div>
+  </section>
+
+  <section class="hire">
+    <h2 data-i18n="hire.svc.heading">Tjänster och pris</h2>
+
+    <div class="hire-block">
+      <p class="hire-note" data-i18n="hire.svc.note">Priserna är ungefärliga. Restid, längre bokningar och extra utrustning påverkar priset. Hör av dig så räknar vi på just ditt projekt.</p>
+
+      <p class="hire-sub" data-i18n="hire.live.heading">Livesändning</p>
+      <p class="hire-sub-note" data-i18n="hire.live.unit">Pris per timme</p>
+      <div class="tier-grid">
+        <article class="tier tier--core">
+          <span class="tier-name" data-i18n="hire.core.name">Core</span>
+          <span class="tier-price" data-i18n="hire.core.price">ca 700 kr/tim</span>
+          <ul>
+            <li data-i18n="hire.core.f1">2 kameror</li>
+            <li data-i18n="hire.core.f2">1 ljuspanel</li>
+            <li data-i18n="hire.core.f3">Grundläggande grafik: resultat, namnskyltar och logga</li>
+          </ul>
+        </article>
+        <article class="tier tier--ultra">
+          <span class="tier-name" data-i18n="hire.ultra.name">Ultra</span>
+          <span class="tier-price" data-i18n="hire.ultra.price">ca 1 400 kr/tim</span>
+          <ul>
+            <li data-i18n="hire.ultra.f1">3 kameror plus en camcorder för extra vinklar</li>
+            <li data-i18n="hire.ultra.f2">2 ljuspaneler</li>
+            <li data-i18n="hire.ultra.f3">Avancerad grafik och repriser</li>
+            <li data-i18n="hire.ultra.f4">2 mikrofoner: en på boom för intervjuer och en för stämning</li>
+            <li data-i18n="hire.ultra.f5">Kommentatorswebbkamera</li>
+            <li data-i18n="hire.ultra.f6">Mer på begäran</li>
+          </ul>
+        </article>
+      </div>
+
+      <p class="hire-sub" data-i18n="hire.other.heading">Övrigt</p>
+      <div class="svc-list">
+        <article class="svc">
+          <h4 data-i18n="hire.film.heading">Filmning</h4>
+          <p data-i18n="hire.film.body">Cirka 2 500 kr för en inspelningsdag på 8 timmar. Större produktioner offereras per projekt.</p>
+        </article>
+        <article class="svc">
+          <h4 data-i18n="hire.music.heading">Musik</h4>
+          <p data-i18n="hire.music.body">Inget standardpris. Vi ger en offert utifrån vad projektet behöver.</p>
+        </article>
+        <article class="svc">
+          <h4 data-i18n="hire.game.heading">Spelutveckling</h4>
+          <p data-i18n="hire.game.body">Bedöms från fall till fall beroende på omfattning och plattform.</p>
+        </article>
+      </div>
+
+      <a href="kontakt.html" class="btn btn-primary btn-lg" data-i18n="home.contactcta">Kom i kontakt</a>
+    </div>
+  </section>
+
+  <section class="hire">
+    <h2 data-i18n="hire.jobs.heading">Roller och jobb</h2>
+
+    <div class="hire-block">
+      <p class="hire-sub" data-i18n="hire.studio.heading">Studiojobb</p>
+      <!-- lägg nya studiojobb som .job-card här; tomt tillstånd nedan -->
+      <div class="job-empty" data-i18n="hire.studio.empty">Inga lediga just nu.</div>
+
+      <p class="hire-sub" data-i18n="hire.casting.heading">Roller och casting</p>
+      <div class="job-grid">
+        <article class="job-card">
+          <h4 data-i18n="hire.job1.title">Röstskådespelare, nytt spel</h4>
+          <span class="job-tag" data-i18n="hire.job1.tag">Betalt</span>
+          <p data-i18n="hire.job1.body">Vi spelar in repliker till ett spel som är under uppbyggnad. Skicka ett kort röstprov. Betalt, ersättningen beror på hur mycket som behövs.</p>
+          <a href="mailto:hej@aplusfilm.se?subject=Roll%3A%20R%C3%B6stsk%C3%A5despelare" class="text-link" data-i18n="hire.job.apply">Sök via mail →</a>
+        </article>
+        <article class="job-card">
+          <h4 data-i18n="hire.job2.title">Skådespelare, pojke 10 till 13 år</h4>
+          <span class="job-tag" data-i18n="hire.job2.tag">500 kr/dag</span>
+          <p data-i18n="hire.job2.body">Filminspelning under oktober. Arvode 500 kr per dag. Ingen erfarenhet krävs.</p>
+          <a href="mailto:hej@aplusfilm.se?subject=Roll%3A%20Sk%C3%A5despelare%20pojke%2010-13" class="text-link" data-i18n="hire.job.apply">Sök via mail →</a>
+        </article>
+        <article class="job-card">
+          <h4 data-i18n="hire.job3.title">Statister</h4>
+          <span class="job-tag" data-i18n="hire.job3.tag">Oavlönat</span>
+          <p data-i18n="hire.job3.body">Vi behöver folk i bakgrunden till några scener i höst. Oavlönat, men du får fika och en plats i eftertexterna.</p>
+          <a href="mailto:hej@aplusfilm.se?subject=Statist" class="text-link" data-i18n="hire.job.apply">Sök via mail →</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <span class="brand-mark small">A<span class="plus">+</span></span>
+  <p data-i18n="footer.text">© 2026 A+ Studios, Alingsås.</p>
+  <div class="footer-links">
+    <a href="https://www.tiktok.com/@aplus.studios" target="_blank" rel="noopener">TikTok</a>
+    <a href="https://www.youtube.com/@A-plus-studios" target="_blank" rel="noopener">YouTube</a>
+    <a href="mailto:hej@aplusfilm.se">Mail</a>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

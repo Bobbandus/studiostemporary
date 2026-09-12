@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projekt | A+ Studios</title>
+<meta name="description" content="MAYDAY, Jonathan I & II, Noomaraton-bidragen och Jaderwave. Allt A+ Studios byggt hittills.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=Archivo+Black&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+
+<header class="site-header">
+  <a href="index.html" class="brand" aria-label="A+ Studios, till startsidan">
+    <span class="brand-mark">A<span class="plus">+</span></span>
+  </a>
+  <nav class="main-nav" id="mainNav">
+    <a href="index.html" data-i18n="nav.home">Hem</a>
+    <a href="om-oss.html" data-i18n="nav.about">Om oss</a>
+    <a href="projekt.html" class="active" data-i18n="nav.projects">Projekt</a>
+    <a href="utrustning.html" data-i18n="nav.gear">Utrustning</a>
+    <a href="anlita.html" data-i18n="nav.hire">Anlita</a>
+    <a href="kontakt.html" class="nav-cta" data-i18n="nav.contact">Kontakt</a>
+  </nav>
+  <div class="header-controls">
+    <button class="lang-toggle" id="langToggle" aria-label="Byt språk / Switch language">
+      <span class="lang-sv">SV</span><span class="lang-sep">/</span><span class="lang-en">EN</span>
+    </button>
+    <button class="menu-toggle" id="menuToggle" aria-label="Meny" aria-expanded="false" aria-controls="mainNav">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main>
+
+  <section class="pbanner">
+    <div class="pbanner-bg" style="background-image:url('noomaraton2026-tiger.png')"></div>
+    <div class="pbanner-mid" aria-hidden="true"></div>
+    <div class="pbanner-scrim"></div>
+    <div class="pbanner-fg">
+      <p class="pbanner-kicker" data-i18n="nav.projects">Projekt</p>
+      <h1 data-i18n="projects.pagetitle">Det vi bygger.</h1>
+      <p class="pbanner-sub" data-i18n="projects.pagesub">Alla våra projekt och mer.</p>
+    </div>
+  </section>
+
+  <section class="projects" id="projects">
+
+    <article class="project project--mayday">
+      <div class="project-media project-media--placeholder parallax-el" data-speed="0.1">
+        <svg viewBox="0 0 200 200" class="mayday-svg" aria-hidden="true">
+          <circle cx="100" cy="100" r="70" fill="none" stroke-dasharray="4 6"/>
+          <rect x="70" y="95" width="60" height="26" rx="8"/>
+          <circle cx="82" cy="88" r="14"/>
+          <circle cx="118" cy="88" r="14"/>
+          <line x1="82" y1="98" x2="82" y2="102"/>
+          <line x1="118" y1="98" x2="118" y2="102"/>
+          <path d="M92 95 L92 78 L108 78 L108 95" fill="none"/>
+          <path d="M96 108 L104 108 M100 104 L100 112" class="cross"/>
+        </svg>
+        <span class="placeholder-tag" data-i18n="projects.placeholder">I produktion</span>
+      </div>
+      <div class="project-copy">
+        <p class="project-kicker" data-i18n="projects.mayday.kicker">Spelutveckling</p>
+        <h3 data-edit="mayday.title">MAYDAY</h3>
+        <p data-i18n="projects.mayday.body">Ett spel där man flyger en ambulans-drönare genom en futuristisk stad och räddar patienter.</p>
+        <p class="project-date" data-i18n="projects.mayday.date">Släpps ???</p>
+      </div>
+    </article>
+
+    <article class="project project--jonathan">
+      <div class="project-media">
+        <a href="https://www.youtube.com/@A-plus-studios" target="_blank" rel="noopener" class="video-thumb" aria-label="Se Jonathan II på YouTube">
+          <img src="jonathan2-trailer.jpg" alt="Jonathan II, officiell trailer. Cyklist i hjälm på en villagata" loading="lazy">
+          <span class="play-btn" aria-hidden="true"></span>
+        </a>
+      </div>
+      <div class="project-copy">
+        <p class="project-kicker" data-i18n="projects.jonathan.kicker">Kortfilm</p>
+        <h3 data-edit="jonathan.title">Jonathan I & II</h3>
+        <p data-i18n="projects.jonathan.body">Två filmer på 5 och 11 minuter om en pojke som planerar och utför rån.</p>
+        <a href="https://www.youtube.com/@A-plus-studios" target="_blank" rel="noopener" class="text-link" data-i18n="projects.jonathan.cta">Se filmerna på YouTube →</a>
+      </div>
+      <div class="filmstrip" role="list">
+        <img role="listitem" src="jonathan2-phone-bw.png" alt="Stillbild ur Jonathan II. Svartvitt, Jonathan sitter vid ett staket med telefonen" loading="lazy">
+        <img role="listitem" src="jonathan2-kitchen.png" alt="Stillbild ur Jonathan II. Kökssamtal i motljus" loading="lazy">
+        <img role="listitem" src="jonathan2-run.png" alt="Stillbild ur Jonathan II. Jonathan springer över en gräsplätt" loading="lazy">
+        <img role="listitem" src="jonathan1-chase.jpg" alt="Stillbild ur Jonathan I. Jakten på trehjulingen genom villakvarteret" loading="lazy">
+      </div>
+    </article>
+
+    <div class="project-duo">
+      <article class="project project--sm project--noom2026">
+        <div class="project-media">
+          <img src="noomaraton2026-tiger.png" alt="Stillbild ur Nån Väckte Tigern I Mig. Person i tigerdräkt mot svart bakgrund" loading="lazy">
+        </div>
+        <div class="project-copy">
+          <p class="project-kicker" data-i18n="projects.noom26.kicker">Noomaraton 2026</p>
+          <h3 data-edit="noom26.title">Nån Väckte Tigern I Mig</h3>
+          <p data-i18n="projects.noom26.body">Vårt bidrag till Noomaraton 2026 i Västra Götaland. Handlar om en man som köper en mystisk dricka som transformerar han till en kaos-sökande tiger.</p>
+          <a href="https://www.youtube.com/@NickeLurig" target="_blank" rel="noopener" class="text-link" data-i18n="projects.watch">Se filmen →</a>
+        </div>
+      </article>
+
+      <article class="project project--sm project--noom2025">
+        <div class="project-media">
+          <img src="noomaraton2025-lake.png" alt="Stillbild ur Lycklig Och Fri. Person med gitarrfodral blickar ut över en sjö" loading="lazy">
+        </div>
+        <div class="project-copy">
+          <p class="project-kicker" data-i18n="projects.noom25.kicker">Noomaraton 2025</p>
+          <h3 data-edit="noom25.title">Lycklig Och Fri</h3>
+          <p data-i18n="projects.noom25.body">Vårt bidrag till Noomaraton 2025 i Västra Götaland. Handlar om en man som hittar en pipleksak som leder han till frihet.</p>
+          <a href="https://www.youtube.com/@NickeLurig" target="_blank" rel="noopener" class="text-link" data-i18n="projects.watch">Se filmen →</a>
+        </div>
+      </article>
+    </div>
+
+    <article class="project project--jaderwave">
+      <div class="project-media project-media--placeholder">
+        <svg viewBox="0 0 200 200" class="hex-svg" aria-hidden="true">
+          <polygon points="100,15 175,55 175,145 100,185 25,145 25,55" fill="none"/>
+          <polyline points="45,110 65,110 75,80 90,140 105,90 120,125 135,110 155,110" class="hex-wave"/>
+        </svg>
+      </div>
+      <div class="project-copy">
+        <p class="project-kicker" data-i18n="projects.jaderwave.kicker">Musik</p>
+        <h3 data-edit="jaderwave.title">Jaderwave</h3>
+        <p data-i18n="projects.jaderwave.body">Artistnamn för musik av Bob Jäderberg själv. Inkluderar låtar från filmer, spel samt andra låtar.</p>
+        <div class="link-row">
+          <a href="https://www.youtube.com/channel/UCHTT0qq7BC7B_AkdogLiZLQ" target="_blank" rel="noopener" class="text-link" data-i18n="projects.jaderwave.yt">Lyssna på YouTube →</a>
+          <a href="https://open.spotify.com/search/Jaderwave" target="_blank" rel="noopener" class="text-link" data-i18n="projects.jaderwave.sp">Sök på Spotify →</a>
+        </div>
+      </div>
+    </article>
+
+    <div class="idea-list">
+      <h3 data-i18n="ideas.heading">Näst på tur</h3>
+      <ul>
+        <li><span class="idea-tag" data-edit="idea.tag1">Manus</span><span data-i18n="ideas.1">Jonathan III. Sista delen i serien. Ligger på manusstadiet.</span></li>
+        <li><span class="idea-tag" data-edit="idea.tag2">Idé</span><span data-i18n="ideas.2">Ett nytt Roblox-spel. Idén finns, bygget har inte börjat.</span></li>
+        <li><span class="idea-tag" data-edit="idea.tag3">2026</span><span data-i18n="ideas.3">Mer live under 2026. Sport och event vi filmar med flera kameror.</span></li>
+      </ul>
+    </div>
+
+    <div class="page-link-strip">
+      <p data-i18n="projects.gearlink">Nyfiken på vad vi filmar och spelar in med?</p>
+      <a href="utrustning.html" class="btn btn-ghost" data-i18n="projects.gearlinkcta">Se utrustningen →</a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <span class="brand-mark small">A<span class="plus">+</span></span>
+  <p data-i18n="footer.text">© 2026 A+ Studios, Alingsås.</p>
+  <div class="footer-links">
+    <a href="https://www.tiktok.com/@aplus.studios" target="_blank" rel="noopener">TikTok</a>
+    <a href="https://www.youtube.com/@A-plus-studios" target="_blank" rel="noopener">YouTube</a>
+    <a href="mailto:hej@aplusfilm.se">Mail</a>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

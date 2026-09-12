@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Utrustning | A+ Studios</title>
+<meta name="description" content="Kameror, ljud, ljus och mjukvara som A+ Studios jobbar med.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=Archivo+Black&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+
+<header class="site-header">
+  <a href="index.html" class="brand" aria-label="A+ Studios, till startsidan">
+    <span class="brand-mark">A<span class="plus">+</span></span>
+  </a>
+  <nav class="main-nav" id="mainNav">
+    <a href="index.html" data-i18n="nav.home">Hem</a>
+    <a href="om-oss.html" data-i18n="nav.about">Om oss</a>
+    <a href="projekt.html" data-i18n="nav.projects">Projekt</a>
+    <a href="utrustning.html" class="active" data-i18n="nav.gear">Utrustning</a>
+    <a href="anlita.html" data-i18n="nav.hire">Anlita</a>
+    <a href="kontakt.html" class="nav-cta" data-i18n="nav.contact">Kontakt</a>
+  </nav>
+  <div class="header-controls">
+    <button class="lang-toggle" id="langToggle" aria-label="Byt språk / Switch language">
+      <span class="lang-sv">SV</span><span class="lang-sep">/</span><span class="lang-en">EN</span>
+    </button>
+    <button class="menu-toggle" id="menuToggle" aria-label="Meny" aria-expanded="false" aria-controls="mainNav">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main>
+
+  <section class="pbanner">
+    <div class="pbanner-bg" style="background-image:url('jonathan2-phone-bw.png')"></div>
+    <div class="pbanner-mid" aria-hidden="true"></div>
+    <div class="pbanner-scrim"></div>
+    <div class="pbanner-fg">
+      <p class="pbanner-kicker" data-i18n="nav.gear">Utrustning</p>
+      <h1 data-i18n="equipment.heading">Vad vi filmar, spelar in och klipper med.</h1>
+      <p class="pbanner-sub" data-i18n="equipment.sub">Kameror, mikrofoner och allt däremellan.</p>
+    </div>
+  </section>
+
+  <section class="gear-band" id="gear-camera">
+    <div class="gear-band-bg" style="background-image:url('jonathan2-run.png')"></div>
+    <div class="gear-band-inner">
+      <div>
+        <svg class="gear-icon" viewBox="0 0 48 48" aria-hidden="true"><rect x="6" y="14" width="30" height="22" rx="3"/><path d="M16 14 L20 8 H28 L32 14"/><circle cx="21" cy="25" r="8"/><rect x="36" y="19" width="6" height="10" rx="1"/></svg>
+        <h3 data-i18n="equipment.cam">Kamera</h3>
+      </div>
+      <ul>
+        <li><span data-edit="gear.cam1">Lumix G7</span> <span class="tag" data-i18n="equipment.tag.workhorse">Sekundärkamera</span></li>
+        <li><span data-edit="gear.cam2">Lumix S5II</span> <span class="tag" data-i18n="equipment.tag.main">Huvudkamera</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="gear-band" id="gear-audio">
+    <div class="gear-band-bg" style="background-image:url('live.png')"></div>
+    <div class="gear-band-inner">
+      <div>
+        <svg class="gear-icon" viewBox="0 0 48 48" aria-hidden="true"><rect x="18" y="6" width="12" height="22" rx="6"/><path d="M12 22c0 8 5 13 12 13s12-5 12-13" fill="none"/><line x1="24" y1="35" x2="24" y2="42"/><line x1="17" y1="42" x2="31" y2="42"/></svg>
+        <h3 data-i18n="equipment.audio">Ljud</h3>
+      </div>
+      <ul>
+        <li><span data-edit="gear.aud1">Sennheiser MKE 600</span> <span class="tag" data-i18n="equipment.tag.shotgun">Huvudmikrofon</span></li>
+        <li><span data-edit="gear.aud2">Rode VideoMic</span> <span class="tag" data-i18n="equipment.tag.oncam">Sekundärmikrofon</span></li>
+        <li><span data-edit="gear.aud3">Rode NT2-A</span> <span class="tag" data-i18n="equipment.tag.studio">Studiomikrofon</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="gear-band" id="gear-light">
+    <div class="gear-band-bg" style="background-image:url('jonathan1-chase-raw.png')"></div>
+    <div class="gear-band-inner">
+      <div>
+        <svg class="gear-icon" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="19" r="12"/><line x1="19" y1="34" x2="29" y2="34"/><line x1="20" y1="40" x2="28" y2="40"/></svg>
+        <h3 data-i18n="equipment.light">Ljus</h3>
+      </div>
+      <ul>
+        <li data-edit="gear.light1">Nanlite Lumipad 25</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="gear-band" id="gear-compute">
+    <div class="gear-band-bg" style="background-image:url('jonathan2-chase-bank.png')"></div>
+    <div class="gear-band-inner">
+      <div>
+        <svg class="gear-icon" viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="8" width="38" height="24" rx="2"/><line x1="17" y1="40" x2="31" y2="40"/><line x1="24" y1="32" x2="24" y2="40"/></svg>
+        <h3 data-i18n="equipment.compute">Dator & mjukvara</h3>
+      </div>
+      <ul>
+        <li><span data-edit="gear.comp1">MacBook Pro</span> <span class="tag" data-i18n="equipment.tag.travel">Redigering</span></li>
+        <li data-i18n="equipment.desktops">Två stationära datorer</li>
+        <li data-edit="gear.sw1">DaVinci Resolve</li>
+        <li data-edit="gear.sw2">Premiere Pro</li>
+        <li data-edit="gear.sw3">After Effects</li>
+        <li data-edit="gear.sw4">FL Studio 2026</li>
+        <li data-edit="gear.sw5">Ableton Live 12 Suite</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="gear-band" id="gear-stream" style="border-bottom:none;">
+    <div class="gear-band-bg" style="background-image:url('noomaraton2025-lake.png')"></div>
+    <div class="gear-band-inner">
+      <div>
+        <svg class="gear-icon" viewBox="0 0 48 48" aria-hidden="true"><rect x="8" y="16" width="24" height="16" rx="2"/><path d="M32 21 L42 16 V32 L32 27" fill="none"/><circle cx="20" cy="24" r="1.5"/></svg>
+        <h3 data-i18n="equipment.stream">Livesändning</h3>
+      </div>
+      <ul>
+        <li data-edit="gear.stream1">Atem Mini Pro</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="page-link-strip" style="max-width:var(--container); margin:0 auto; padding:64px var(--gutter);">
+    <p data-i18n="equipment.contactlink">Vill du att vi tar med det här till ditt projekt?</p>
+    <a href="kontakt.html" class="btn btn-ghost" data-i18n="home.contactcta">Kom i kontakt</a>
+  </div>
+
+</main>
+
+<footer class="site-footer">
+  <span class="brand-mark small">A<span class="plus">+</span></span>
+  <p data-i18n="footer.text">© 2026 A+ Studios, Alingsås.</p>
+  <div class="footer-links">
+    <a href="https://www.tiktok.com/@aplus.studios" target="_blank" rel="noopener">TikTok</a>
+    <a href="https://www.youtube.com/@A-plus-studios" target="_blank" rel="noopener">YouTube</a>
+    <a href="mailto:hej@aplusfilm.se">Mail</a>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
