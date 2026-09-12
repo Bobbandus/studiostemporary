@@ -15,6 +15,14 @@
     {
       "src": "/utrustning",
       "dest": "/utrustning.html"
+    },
+    {
+      "src": "/anlita",
+      "dest": "/anlita.html"
+    },
+    {
+      "src": "/kontakt",
+      "dest": "/kontakt.html"
     }
   ]
 }
