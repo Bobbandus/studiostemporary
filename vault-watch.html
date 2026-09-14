@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Spelar upp | A+ Vault</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=Archivo+Black&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="vault.css">
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+
+<header class="vault-nav">
+  <a href="vault.html" class="brand" aria-label="Tillbaka till A+ Vault">
+    <span class="brand-mark">A<span class="plus">+</span></span>
+  </a>
+  <div class="vault-nav-links">
+    <span class="vault-nav-tag">VAULT · PROTOTYP</span>
+    <div class="vault-profile" aria-hidden="true">
+      <span class="vault-profile-badge">A+</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="vault-player-wrap">
+    <video id="vaultPlayer" controls preload="metadata"></video>
+  </div>
+
+  <section class="vault-watch-info">
+    <h1 id="watchTitle">Laddar…</h1>
+    <p id="watchSynopsis"></p>
+  </section>
+
+  <section class="vault-episode-list" id="watchEpisodes" hidden>
+    <h2>Avsnitt</h2>
+    <ul id="watchEpisodeItems" style="list-style:none; padding:0; margin:0;"></ul>
+  </section>
+
+</main>
+
+<footer class="vault-footer">
+  A+ Vault — intern prototyp för framtida projekt. Inte länkad i huvudmenyn.
+</footer>
+
+<script src="vault.js"></script>
+</body>
+</html>

@@ -597,11 +597,56 @@ main section h2{
 .pbanner-sub{ margin:16px auto 0; max-width:50ch; color:#dcdcd6; font-size:1.04rem; }
 
 /* ==========================================================================
+   ABOUT PAGE — asymmetric editorial masthead (leads into .timeline)
+   ========================================================================== */
+.about-masthead{
+  position:relative; overflow:hidden; padding:148px var(--gutter) 0;
+  min-height:46vh; min-height:46svh; display:flex; align-items:flex-end;
+  border-bottom:1px solid var(--line);
+}
+.about-masthead-bg{
+  position:absolute; inset:0; background-size:cover; background-position:center;
+  filter:grayscale(0.6) contrast(1.1) brightness(0.3);
+}
+.about-masthead-scrim{
+  position:absolute; inset:0;
+  background:linear-gradient(100deg, rgba(11,11,12,0.97) 0%, rgba(11,11,12,0.86) 42%, rgba(11,11,12,0.55) 100%);
+}
+.about-masthead-grid{
+  position:relative; z-index:2; width:100%; max-width:var(--container); margin:0 auto;
+  padding-bottom:56px; display:grid; grid-template-columns:200px 1fr; gap:32px; align-items:end;
+}
+.about-masthead-col--label{ border-left:3px solid var(--accent); padding-left:18px; }
+.about-masthead-kicker{
+  font-family:var(--font-mono); font-weight:700; text-transform:uppercase; letter-spacing:0.2em;
+  color:var(--accent); font-size:0.72rem; margin:0 0 10px;
+}
+.about-masthead-loc{ font-family:var(--font-mono); color:var(--text-muted); font-size:0.82rem; margin:0; }
+.about-masthead-col--title h1{ font-family:var(--font-black); font-size:clamp(2.2rem,6vw,4.6rem); letter-spacing:-0.03em; max-width:16ch; }
+@media (max-width:700px){
+  .about-masthead-grid{ grid-template-columns:1fr; }
+  .about-masthead-col--label{ order:2; margin-top:18px; }
+}
+
+/* ==========================================================================
    GEAR PAGE — category bands
    ========================================================================== */
+.gear-intro{
+  padding:156px var(--gutter) 64px; border-bottom:1px solid var(--line);
+  background:var(--bg-alt); counter-reset:gear-band;
+}
+.gear-intro-inner{ max-width:var(--container); margin:0 auto; }
+.gear-intro-kicker{
+  font-family:var(--font-mono); font-weight:700; text-transform:uppercase; letter-spacing:0.2em;
+  color:var(--accent); font-size:0.75rem; margin:0 0 18px;
+}
+.gear-intro-inner h1{ font-family:var(--font-black); font-size:clamp(2.1rem,5.5vw,3.6rem); letter-spacing:-0.03em; max-width:20ch; }
+.gear-intro-sub{ margin-top:16px; max-width:50ch; color:#c9c9c4; font-size:1.05rem; }
+
 .gear-band{
   position:relative; padding: clamp(64px,10vh,110px) var(--gutter);
   border-bottom:1px solid var(--line); overflow:hidden;
+  counter-increment: gear-band;
 }
 .gear-band-bg{
   position:absolute; inset:-10%; background-size:cover; background-position:center;
@@ -615,9 +660,11 @@ main section h2{
   content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background: var(--accent); opacity:0.6;
 }
 .gear-band-inner{ position:relative; z-index:2; max-width: var(--container); margin:0 auto; display:grid; grid-template-columns: 1fr 1.4fr; gap:48px; align-items:start; }
-.gear-band-index{ font-family:var(--font-mono); font-weight:700; color: var(--accent); font-size:0.85rem; letter-spacing:0.16em; }
-.gear-icon{ width:44px; height:44px; margin-bottom:16px; }
-.gear-icon rect,.gear-icon circle,.gear-icon path,.gear-icon line,.gear-icon polygon{ fill:none; stroke: var(--accent); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.gear-band-index{
+  font-family:var(--font-mono); font-weight:700; color: var(--accent); font-size:0.85rem; letter-spacing:0.16em;
+  display:block; margin-bottom:2px;
+}
+.gear-band-index::before{ content:"0" counter(gear-band); }
 .gear-band h3{ font-family: var(--font-black); font-size: clamp(1.6rem,3vw,2.2rem); margin-top:10px; letter-spacing:-0.02em; }
 .gear-band ul{ display:flex; flex-direction:column; }
 .gear-band li{

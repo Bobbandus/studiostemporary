@@ -23,6 +23,10 @@
     {
       "src": "/kontakt",
       "dest": "/kontakt.html"
+    },
+    {
+      "src": "/vault",
+      "dest": "/vault.html"
     }
   ]
 }

@@ -1,0 +1,147 @@
+/* ==========================================================================
+   A+ VAULT — internal video library prototype
+   Reuses style.css tokens/fonts/.grain/.btn — no new colors, no Netflix skin.
+   ========================================================================== */
+
+/* style.css has no global [hidden] reset, so force it here — otherwise
+   display:flex on .vault-hero etc. would win over the hidden attribute. */
+[hidden]{ display:none !important; }
+
+.vault-nav{
+  position:fixed; top:0; left:0; right:0; z-index:400;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px var(--gutter);
+  background:linear-gradient(to bottom, rgba(10,10,10,0.92), rgba(10,10,10,0));
+}
+.vault-nav-links{ display:flex; align-items:center; gap:20px; }
+.vault-nav-tag{
+  font-family:var(--font-mono); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.14em;
+  color:var(--text-muted); padding:6px 13px; border-radius:999px;
+  border:1px solid var(--glass-border); background:var(--glass-bg);
+}
+.vault-profile{ display:flex; align-items:center; gap:10px; }
+.vault-profile-badge{
+  width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  background:var(--glass-bg-strong); border:1px solid var(--glass-border); color:var(--accent);
+  font-family:var(--font-mono); font-weight:700; font-size:0.85rem;
+}
+
+/* HERO */
+.vault-hero{ position:relative; min-height:78vh; min-height:78svh; display:flex; align-items:flex-end; overflow:hidden; }
+.vault-hero-bg{
+  position:absolute; inset:-5%; background-size:cover; background-position:center 30%;
+  filter:grayscale(0.35) contrast(1.1) brightness(0.75);
+}
+.vault-hero-scrim{
+  position:absolute; inset:0;
+  background:linear-gradient(to top, rgba(11,11,12,1) 8%, rgba(11,11,12,0.55) 48%, rgba(11,11,12,0.2) 100%);
+}
+.vault-hero-content{ position:relative; z-index:2; padding:0 var(--gutter) 64px; max-width:760px; }
+.vault-hero-kicker{
+  font-family:var(--font-mono); font-weight:700; text-transform:uppercase; letter-spacing:0.18em;
+  color:var(--accent); font-size:0.78rem; margin-bottom:14px;
+}
+.vault-hero-kicker::before{ content:"◉ "; color:var(--flare); }
+.vault-hero-content h1{
+  font-family:var(--font-black); font-size:clamp(2.2rem, 6vw, 4.4rem); letter-spacing:-0.03em; line-height:1.02;
+}
+.vault-hero-desc{ margin-top:18px; max-width:56ch; font-size:1.05rem; color:#dcdcd6; }
+.vault-hero-meta{ margin-top:14px; font-family:var(--font-mono); font-size:0.82rem; color:var(--text-muted); letter-spacing:0.04em; }
+.vault-hero-ctas{ display:flex; gap:16px; margin-top:30px; flex-wrap:wrap; }
+
+/* SEARCH + FILTERS */
+.vault-search{
+  max-width:var(--container); margin:0 auto; padding:40px var(--gutter) 0;
+  display:flex; gap:20px; flex-wrap:wrap; align-items:center; justify-content:space-between;
+}
+.vault-search input{
+  flex:1 1 260px; min-width:0; padding:12px 18px; border-radius:999px;
+  background:var(--glass-bg); border:1px solid var(--glass-border); color:var(--text);
+  font-family:var(--font-body); font-size:0.95rem;
+}
+.vault-search input::placeholder{ color:var(--text-muted); }
+.vault-search input:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+.vault-cat-filters{ display:flex; gap:10px; flex-wrap:wrap; }
+.vault-cat-chip{
+  font-family:var(--font-mono); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em;
+  padding:8px 16px; border-radius:999px; border:1px solid var(--glass-border); background:var(--glass-bg);
+  color:var(--text-muted); cursor:pointer; transition:color .2s ease, border-color .2s ease, background .2s ease;
+}
+.vault-cat-chip:hover{ color:var(--text); }
+.vault-cat-chip.active{ color:var(--accent-ink); background:var(--accent); border-color:var(--accent); }
+
+/* ROWS + CARDS */
+.vault-grid-section{ max-width:var(--container); margin:0 auto; padding:32px var(--gutter) 96px; }
+.vault-row{ margin-top:44px; }
+.vault-row-heading{
+  font-family:var(--font-black); font-size:clamp(1.2rem, 2.4vw, 1.6rem); letter-spacing:-0.02em; margin-bottom:18px;
+}
+.vault-row-track{
+  display:flex; gap:16px; overflow-x:auto; padding-bottom:10px; scroll-snap-type:x proximity;
+}
+.vault-row-track::-webkit-scrollbar{ height:6px; }
+.vault-row-track::-webkit-scrollbar-thumb{ background:var(--line); border-radius:999px; }
+
+.vault-card{
+  flex:0 0 220px; scroll-snap-align:start; display:block; border-radius:8px; overflow:hidden;
+  background:var(--bg-raised); border:1px solid var(--line);
+  transition:transform .2s ease, border-color .2s ease;
+}
+.vault-card:hover{ transform:translateY(-4px); border-color:rgba(255,255,255,0.25); }
+.vault-card-poster{ position:relative; aspect-ratio:16/9; background:var(--bg-alt); overflow:hidden; }
+.vault-card-poster img{ width:100%; height:100%; object-fit:cover; }
+.vault-card-progress{ position:absolute; left:0; right:0; bottom:0; height:3px; background:rgba(255,255,255,0.15); }
+.vault-card-progress span{ display:block; height:100%; background:var(--accent); }
+.vault-card-body{ padding:12px 14px; }
+.vault-card-title{ font-family:var(--font-display); font-weight:700; font-size:0.92rem; letter-spacing:-0.01em; }
+.vault-card-meta{ margin-top:4px; font-family:var(--font-mono); font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; }
+
+/* EMPTY STATE */
+.vault-empty{ max-width:640px; margin:0 auto; padding:180px var(--gutter) 120px; text-align:left; }
+.vault-empty-kicker{
+  font-family:var(--font-mono); font-weight:700; text-transform:uppercase; letter-spacing:0.18em;
+  color:var(--accent); font-size:0.78rem; margin-bottom:16px;
+}
+.vault-empty-kicker::before{ content:"◉ "; color:var(--flare); }
+.vault-empty h1{ font-family:var(--font-black); font-size:clamp(1.8rem,4.5vw,2.6rem); letter-spacing:-0.03em; }
+.vault-empty > p{ margin-top:16px; color:#d1d1cc; font-size:1.05rem; }
+.vault-empty-steps{ margin-top:24px; padding-left:22px; display:flex; flex-direction:column; gap:12px; color:#d7d7d2; }
+.vault-empty-steps li::marker{ color:var(--accent); font-family:var(--font-mono); }
+.vault-empty code{
+  font-family:var(--font-mono); font-size:0.86em; background:var(--bg-raised); border:1px solid var(--line);
+  padding:2px 6px; border-radius:4px; color:var(--gold);
+}
+
+.vault-footer{
+  padding:48px var(--gutter) 64px; border-top:1px solid var(--line);
+  font-family:var(--font-mono); font-size:0.78rem; color:var(--text-muted);
+}
+
+/* WATCH PAGE */
+.vault-player-wrap{
+  max-width:1100px; margin:96px auto 0; padding:0 var(--gutter);
+}
+.vault-player-wrap video{
+  width:100%; border-radius:6px; background:#000; aspect-ratio:16/9; display:block;
+}
+.vault-watch-info{ max-width:1100px; margin:0 auto; padding:28px var(--gutter) 0; }
+.vault-watch-info h1{ font-family:var(--font-black); font-size:clamp(1.6rem,3.4vw,2.4rem); letter-spacing:-0.02em; }
+.vault-watch-info p{ margin-top:14px; max-width:70ch; color:#d1d1cc; font-size:1rem; }
+
+.vault-episode-list{ max-width:1100px; margin:40px auto 0; padding:0 var(--gutter) 96px; }
+.vault-episode-list h2{ font-family:var(--font-black); font-size:1.2rem; letter-spacing:-0.02em; margin-bottom:16px; }
+.vault-episode-item{
+  display:flex; align-items:center; gap:16px; padding:14px 16px; border-radius:8px;
+  border:1px solid var(--line); margin-bottom:10px; cursor:pointer; background:var(--bg-raised);
+  transition:border-color .2s ease, background .2s ease;
+}
+.vault-episode-item:hover{ border-color:rgba(255,255,255,0.25); }
+.vault-episode-item.active{ border-color:var(--accent); background:#151a17; }
+.vault-episode-num{ font-family:var(--font-mono); font-weight:700; color:var(--accent); font-size:0.9rem; flex:0 0 28px; }
+.vault-episode-title{ font-family:var(--font-display); font-weight:700; font-size:0.98rem; flex:1; }
+.vault-episode-duration{ font-family:var(--font-mono); font-size:0.78rem; color:var(--text-muted); }
+
+@media (max-width:700px){
+  .vault-search{ flex-direction:column; align-items:stretch; }
+  .vault-card{ flex-basis:170px; }
+}

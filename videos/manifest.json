@@ -1,0 +1,9 @@
+{
+  "categories": [
+    { "id": "film", "label": "Film" },
+    { "id": "musik", "label": "Musik" },
+    { "id": "live", "label": "Livesändning" },
+    { "id": "bakom-kulisserna", "label": "Bakom kulisserna" }
+  ],
+  "titles": []
+}

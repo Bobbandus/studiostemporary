@@ -34,7 +34,7 @@ const translations = {
 
   "home.morelink": { sv: "MAYDAY, Jonathan, Noomaraton och Jaderwave samlat på ett ställe.", en: "MAYDAY, Jonathan, Noomaraton and Jaderwave in one place." },
   "home.morelink2": { sv: "Vill du se vad vi faktiskt bygger?", en: "Want to see what we're actually building?" },
-  "home.moreprojects": { sv: "Alla projekt →", en: "All projects →" },
+  "home.moreprojects": { sv: "Alla projekt", en: "All projects" },
   "home.contactcta": { sv: "Kom i kontakt", en: "Get in touch" },
 
   "pillars.heading": { sv: "Fyra uppgifter.", en: "Four areas." },
@@ -64,7 +64,7 @@ const translations = {
   "projects.pagesub": { sv: "Alla våra projekt och mer.", en: "All our projects, and then some." },
   "projects.placeholder": { sv: "I produktion", en: "In production" },
   "projects.gearlink": { sv: "Nyfiken på vad vi filmar och spelar in med?", en: "Curious what we shoot and record with?" },
-  "projects.gearlinkcta": { sv: "Se utrustningen →", en: "See the gear →" },
+  "projects.gearlinkcta": { sv: "Se utrustningen", en: "See the gear" },
 
   "projects.mayday.kicker": { sv: "Spelutveckling", en: "Game development" },
   "projects.mayday.body": {

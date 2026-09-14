@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>A+ Vault | A+ Studios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=Archivo+Black&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="vault.css">
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+
+<header class="vault-nav">
+  <a href="index.html" class="brand" aria-label="A+ Studios, till startsidan">
+    <span class="brand-mark">A<span class="plus">+</span></span>
+  </a>
+  <div class="vault-nav-links">
+    <span class="vault-nav-tag">VAULT · PROTOTYP</span>
+    <div class="vault-profile" aria-hidden="true">
+      <span class="vault-profile-badge">A+</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section class="vault-hero" id="vaultHero" hidden>
+    <div class="vault-hero-bg" id="vaultHeroBg"></div>
+    <div class="vault-hero-scrim"></div>
+    <div class="vault-hero-content">
+      <p class="vault-hero-kicker" id="vaultHeroKicker">Film</p>
+      <h1 id="vaultHeroTitle"></h1>
+      <p class="vault-hero-desc" id="vaultHeroDesc"></p>
+      <p class="vault-hero-meta" id="vaultHeroMeta"></p>
+      <div class="vault-hero-ctas">
+        <a href="#" id="vaultHeroPlay" class="btn btn-primary btn-lg">Spela upp</a>
+        <a href="#vaultCategories" class="btn btn-ghost btn-lg">Bläddra i valvet</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="vault-empty" id="vaultEmpty" hidden>
+    <p class="vault-empty-kicker">Tomt valv</p>
+    <h1>Inga videor i arkivet ännu.</h1>
+    <p>Så här lägger du till den första filmen eller serien:</p>
+    <ol class="vault-empty-steps">
+      <li>Lägg mp4-filen i en ny mapp: <code>videos/mitt-projekt/mitt-projekt.mp4</code></li>
+      <li>Lägg till en post i <code>videos/manifest.json</code> under <code>"titles"</code> — se <code>videos/README.md</code>.</li>
+      <li>Committa och pusha. Vercel bygger om automatiskt.</li>
+    </ol>
+  </section>
+
+  <div class="vault-grid-section" id="vaultContinueRow" hidden>
+    <div class="vault-row">
+      <p class="vault-row-heading">Fortsätt titta</p>
+      <div class="vault-row-track" id="vaultContinueTrack"></div>
+    </div>
+  </div>
+
+  <section class="vault-search" id="vaultSearchSection">
+    <input type="search" id="vaultSearch" placeholder="Sök i valvet…" aria-label="Sök i valvet">
+    <div class="vault-cat-filters" id="vaultCatFilters"></div>
+  </section>
+
+  <div class="vault-grid-section" id="vaultCategories"></div>
+
+</main>
+
+<footer class="vault-footer">
+  A+ Vault — intern prototyp för framtida projekt. Inte länkad i huvudmenyn.
+</footer>
+
+<script src="vault.js"></script>
+</body>
+</html>
