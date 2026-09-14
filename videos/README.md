@@ -61,7 +61,13 @@ Samma sak, men lägg flera mp4-filer i mappen och beskriv varje avsnitt separat:
 | `featured` | film/serie | `true` på högst en titel — den blir hero-banner på `/vault`. Saknas det helt visas första titeln i listan istället. |
 | `episodes` | serie | Lista med avsnitt, samma fält som en film fast utan `type`/`category`/`poster` (ärver från serien, men kan sättas per avsnitt om ett avsnitt ska ha egen bild). |
 
-## Kända begränsningar (det här är en prototyp)
+## Just nu
+
+Alla titlar i manifestet pekar tillfälligt på samma placeholder-klipp (`videos/ident.mp4`) tills de
+riktiga klippen finns klara. Byt bara ut `video`-sökvägen (eller `episodes[].video`) per titel när
+en riktig fil är redo — resten av posten kan stå kvar som den är.
+
+## Kända begränsningar
 
 - **Manifestet är sanningen.** Att bara droppa en mp4-fil i `videos/`-mappen gör ingenting förrän
   den också finns med i `manifest.json`.

@@ -27,6 +27,10 @@
     {
       "src": "/vault",
       "dest": "/vault.html"
+    },
+    {
+      "src": "/vault/(?<slug>[^/]+)",
+      "dest": "/vault-watch.html?slug=$slug"
     }
   ]
 }

@@ -48,9 +48,8 @@ function progressKey(slug, episode){
    ========================================================================== */
 
 function watchHref(entry, episode){
-  const params = new URLSearchParams({ slug: entry.slug });
-  if (episode) params.set("ep", String(episode.episode));
-  return "vault-watch.html?" + params.toString();
+  const base = "/vault/" + entry.slug;
+  return episode ? base + "?ep=" + episode.episode : base;
 }
 
 function buildCard(entry, opts){
@@ -248,6 +247,15 @@ function getQueryParams(){
   return new URLSearchParams(window.location.search);
 }
 
+/* Vercel rewrites /vault/<slug> to vault-watch.html?slug=<slug> on the
+   server side only — the browser's own address bar (and therefore
+   location.search) still just shows /vault/<slug>, so the slug has to be
+   read from the path. Falls back to ?slug= for direct/local access. */
+function getSlugFromPath(){
+  const m = window.location.pathname.match(/\/vault\/([^/?#]+)/);
+  return m ? decodeURIComponent(m[1]) : null;
+}
+
 function findEntryBySlug(manifest, slug){
   return manifest.titles.find(t => t.slug === slug) || null;
 }
@@ -311,8 +319,7 @@ function renderWatchPage(manifest, entry, episode){
         '<span class="vault-episode-title">' + ep.title + '</span>' +
         '<span class="vault-episode-duration">' + formatDuration(ep.duration) + '</span>';
       li.addEventListener("click", () => {
-        const params = new URLSearchParams({ slug: entry.slug, ep: String(ep.episode) });
-        history.replaceState(null, "", "vault-watch.html?" + params.toString());
+        history.replaceState(null, "", "/vault/" + entry.slug + "?ep=" + ep.episode);
         renderWatchPage(manifest, entry, ep);
       });
       items.appendChild(li);
@@ -326,7 +333,8 @@ function renderWatchPage(manifest, entry, episode){
 async function initWatchPage(){
   const manifest = await loadManifest();
   const params = getQueryParams();
-  const entry = findEntryBySlug(manifest, params.get("slug"));
+  const slug = getSlugFromPath() || params.get("slug");
+  const entry = findEntryBySlug(manifest, slug);
   const titleEl = document.getElementById("watchTitle");
 
   if (!entry){
