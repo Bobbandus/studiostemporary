@@ -9,7 +9,7 @@ const VAULT_PROGRESS_KEY = "aplusVaultProgress";
 
 async function loadManifest(){
   try{
-    const res = await fetch("videos/manifest.json", { cache: "no-store" });
+    const res = await fetch("/videos/manifest.json", { cache: "no-store" });
     if (!res.ok) throw new Error("manifest fetch failed: " + res.status);
     const data = await res.json();
     return {
@@ -58,7 +58,6 @@ function buildCard(entry, opts){
   a.className = "vault-card";
   a.href = opts.episode ? watchHref(entry, opts.episode) : watchHref(entry, entry.type === "series" ? entry.episodes[0] : null);
   a.dataset.title = entry.title.toLowerCase();
-  a.dataset.category = entry.category || "";
 
   const poster = document.createElement("div");
   poster.className = "vault-card-poster";
@@ -145,65 +144,26 @@ function renderContinueWatching(manifest){
   row.hidden = false;
 }
 
-function renderCategoryRows(manifest){
+function renderTitleGrid(manifest){
   const section = document.getElementById("vaultCategories");
   if (!section) return;
   section.innerHTML = "";
+  if (!manifest.titles.length) return;
 
-  manifest.categories.forEach(cat => {
-    const items = manifest.titles.filter(t => t.category === cat.id);
-    if (!items.length) return;
+  const row = document.createElement("div");
+  row.className = "vault-row";
 
-    const row = document.createElement("div");
-    row.className = "vault-row";
-    row.dataset.category = cat.id;
+  const heading = document.createElement("p");
+  heading.className = "vault-row-heading";
+  heading.textContent = "Filmer";
 
-    const heading = document.createElement("p");
-    heading.className = "vault-row-heading";
-    heading.textContent = cat.label;
+  const track = document.createElement("div");
+  track.className = "vault-row-track";
+  manifest.titles.forEach(entry => track.appendChild(buildCard(entry)));
 
-    const track = document.createElement("div");
-    track.className = "vault-row-track";
-    items.forEach(entry => track.appendChild(buildCard(entry)));
-
-    row.appendChild(heading);
-    row.appendChild(track);
-    section.appendChild(row);
-  });
-}
-
-function renderCategoryFilterChips(manifest){
-  const wrap = document.getElementById("vaultCatFilters");
-  if (!wrap) return;
-  wrap.innerHTML = "";
-
-  const allChip = document.createElement("button");
-  allChip.type = "button";
-  allChip.className = "vault-cat-chip active";
-  allChip.textContent = "Allt";
-  allChip.dataset.category = "";
-  wrap.appendChild(allChip);
-
-  manifest.categories.forEach(cat => {
-    if (!manifest.titles.some(t => t.category === cat.id)) return;
-    const chip = document.createElement("button");
-    chip.type = "button";
-    chip.className = "vault-cat-chip";
-    chip.textContent = cat.label;
-    chip.dataset.category = cat.id;
-    wrap.appendChild(chip);
-  });
-
-  wrap.addEventListener("click", (e) => {
-    const btn = e.target.closest(".vault-cat-chip");
-    if (!btn) return;
-    wrap.querySelectorAll(".vault-cat-chip").forEach(c => c.classList.remove("active"));
-    btn.classList.add("active");
-    const cat = btn.dataset.category;
-    document.querySelectorAll(".vault-row[data-category]").forEach(row => {
-      row.hidden = !!cat && row.dataset.category !== cat;
-    });
-  });
+  row.appendChild(heading);
+  row.appendChild(track);
+  section.appendChild(row);
 }
 
 function initSearch(){
@@ -234,8 +194,7 @@ async function initVaultPage(){
   }
   renderHero(manifest);
   renderContinueWatching(manifest);
-  renderCategoryFilterChips(manifest);
-  renderCategoryRows(manifest);
+  renderTitleGrid(manifest);
   initSearch();
 }
 

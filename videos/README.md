@@ -14,12 +14,11 @@ ingenting av sig själv — filen måste också få en rad i `manifest.json`.
   "slug": "mitt-projekt",
   "type": "movie",
   "title": "Mitt Projekt",
-  "category": "film",
   "year": 2026,
-  "poster": "jonathan2-trailer.jpg",
+  "poster": "/jonathan2-trailer.jpg",
   "synopsis": "En kort beskrivning av vad filmen handlar om.",
   "duration": 300,
-  "video": "videos/mitt-projekt/mitt-projekt.mp4"
+  "video": "/videos/mitt-projekt/mitt-projekt.mp4"
 }
 ```
 
@@ -34,13 +33,12 @@ Samma sak, men lägg flera mp4-filer i mappen och beskriv varje avsnitt separat:
   "slug": "min-serie",
   "type": "series",
   "title": "Min Serie",
-  "category": "film",
   "year": 2026,
-  "poster": "noomaraton2026-tiger.png",
+  "poster": "/noomaraton2026-tiger.png",
   "synopsis": "En kort beskrivning av serien.",
   "episodes": [
-    { "title": "Avsnitt 1", "episode": 1, "duration": 300, "video": "videos/min-serie/01.mp4" },
-    { "title": "Avsnitt 2", "episode": 2, "duration": 280, "video": "videos/min-serie/02.mp4" }
+    { "title": "Avsnitt 1", "episode": 1, "duration": 300, "video": "/videos/min-serie/01.mp4" },
+    { "title": "Avsnitt 2", "episode": 2, "duration": 280, "video": "/videos/min-serie/02.mp4" }
   ]
 }
 ```
@@ -52,14 +50,15 @@ Samma sak, men lägg flera mp4-filer i mappen och beskriv varje avsnitt separat:
 | `slug` | alla | Unikt, kebab-case. Används i URL, mapp-namn och för att komma ihåg var man var. |
 | `type` | alla | `"movie"` eller `"series"`. |
 | `title` | alla | Visningsnamn. |
-| `category` | alla | Måste matcha ett `id` i `categories`-listan högst upp i manifestet. |
 | `year` | alla | Årtal, valfritt men trevligt. |
-| `poster` | alla | Bildväg — antingen en befintlig bild på sajten (t.ex. `noomaraton2026-tiger.png`) eller en ny bild du lägger i samma mapp som videon. |
+| `poster` | alla | Bildväg **med inledande `/`** — antingen en befintlig bild på sajten (t.ex. `/noomaraton2026-tiger.png`) eller en ny bild du lägger i samma mapp som videon (t.ex. `/videos/mitt-projekt/poster.jpg`). |
 | `synopsis` | alla | Kort beskrivning. |
 | `duration` | film/avsnitt | Längd i sekunder. |
-| `video` | film/avsnitt | Sökväg till mp4-filen, relativt sajtens rot. |
+| `video` | film/avsnitt | Sökväg till mp4-filen **med inledande `/`** (t.ex. `/videos/mitt-projekt/mitt-projekt.mp4`). Utan `/` i början letar sidan på fel ställe när den öppnas via `/vault/<slug>`. |
 | `featured` | film/serie | `true` på högst en titel — den blir hero-banner på `/vault`. Saknas det helt visas första titeln i listan istället. |
-| `episodes` | serie | Lista med avsnitt, samma fält som en film fast utan `type`/`category`/`poster` (ärver från serien, men kan sättas per avsnitt om ett avsnitt ska ha egen bild). |
+| `episodes` | serie | Lista med avsnitt, samma fält som en film fast utan `type`/`poster` (ärver posterbilden från serien, men kan sättas per avsnitt om ett avsnitt ska ha egen bild). |
+
+Vault innehåller bara riktiga film/serie-projekt (inget om musik, spel eller livesändning) — håll det så.
 
 ## Just nu
 

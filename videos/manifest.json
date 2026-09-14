@@ -1,71 +1,35 @@
 {
-  "categories": [
-    { "id": "film", "label": "Film" },
-    { "id": "musik", "label": "Musik" },
-    { "id": "spel", "label": "Spel" },
-    { "id": "live", "label": "Live" }
-  ],
   "titles": [
     {
       "slug": "jonathan",
       "type": "series",
       "title": "Jonathan",
-      "category": "film",
       "year": 2026,
-      "poster": "jonathan2-trailer.jpg",
+      "poster": "/jonathan2-trailer.jpg",
       "synopsis": "Två filmer om en pojke som planerar och utför rån.",
       "featured": true,
       "episodes": [
-        { "title": "Jonathan I", "episode": 1, "duration": 300, "poster": "jonathan1-chase.jpg", "video": "videos/ident.mp4" },
-        { "title": "Jonathan II", "episode": 2, "duration": 660, "poster": "jonathan2-trailer.jpg", "video": "videos/ident.mp4" }
+        { "title": "Jonathan I", "episode": 1, "duration": 300, "poster": "/jonathan1-chase.jpg", "video": "/videos/ident.mp4" },
+        { "title": "Jonathan II", "episode": 2, "duration": 660, "poster": "/jonathan2-trailer.jpg", "video": "/videos/ident.mp4" }
       ]
     },
     {
       "slug": "nagon-vackte-tigern-i-mig",
       "type": "movie",
       "title": "Nån Väckte Tigern I Mig",
-      "category": "film",
       "year": 2026,
-      "poster": "noomaraton2026-tiger.png",
+      "poster": "/noomaraton2026-tiger.png",
       "synopsis": "Vårt bidrag till Noomaraton 2026 i Västra Götaland. En man köper en mystisk dricka som transformerar honom till en kaos-sökande tiger.",
-      "video": "videos/ident.mp4"
+      "video": "/videos/ident.mp4"
     },
     {
       "slug": "lycklig-och-fri",
       "type": "movie",
       "title": "Lycklig Och Fri",
-      "category": "film",
       "year": 2025,
-      "poster": "noomaraton2025-lake.png",
+      "poster": "/noomaraton2025-lake.png",
       "synopsis": "Vårt bidrag till Noomaraton 2025 i Västra Götaland. En man hittar en pipleksak som leder honom till frihet.",
-      "video": "videos/ident.mp4"
-    },
-    {
-      "slug": "jaderwave",
-      "type": "movie",
-      "title": "Jaderwave",
-      "category": "musik",
-      "poster": "jonathan2-trailer.jpg",
-      "synopsis": "Artistnamn för musik av Bob Jäderberg själv. Låtar från filmer, spel och egna releaser.",
-      "video": "videos/ident.mp4"
-    },
-    {
-      "slug": "mayday",
-      "type": "movie",
-      "title": "MAYDAY",
-      "category": "spel",
-      "poster": "spel.png",
-      "synopsis": "Ett spel där man flyger en ambulans-drönare genom en futuristisk stad och räddar patienter. Släpps ???",
-      "video": "videos/ident.mp4"
-    },
-    {
-      "slug": "livesandning",
-      "type": "movie",
-      "title": "Livesändning i realtid",
-      "category": "live",
-      "poster": "live.png",
-      "synopsis": "Multikamera-produktion och regi i realtid. Evenemang, sport samt lite andra grejer vi inte kan visa än.",
-      "video": "videos/ident.mp4"
+      "video": "/videos/ident.mp4"
     }
   ]
 }
