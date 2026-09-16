@@ -19,8 +19,8 @@ const translations = {
   "story.location": { sv: "Alingsås, Sverige", en: "Alingsås, Sweden" },
   "story.heading":  { sv: "Från skolkorridoren till skärmen.", en: "From the school hallway to the screen." },
   "story.teaser": {
-    sv: "A+ Studios är en kreativ produktionshubb. Film, musik, spel och livesändning. Grundat 2021, drivet av ett gäng högstadieelever som tar det här på fullaste allvar.",
-    en: "A+ Studios is a creative production hub. Film, music, games and live streaming. Founded in 2021, run by a crew of middle-schoolers who take this completely seriously."
+    sv: "Vi är ett gäng högstadiekompisar i Alingsås som gör film, musik, spel och livesändningar tillsammans. Grundades 2021, och vi tar det här på fullaste allvar.",
+    en: "We're a bunch of middle-school friends in Alingsås making film, music, games and livestreams together. Founded in 2021, and we take this completely seriously."
   },
   "story.readmore": { sv: "Läs hela historien →", en: "Read the full story →" },
   "story.body": {
@@ -55,8 +55,8 @@ const translations = {
   },
   "pillars.live.title": { sv: "Livesändning", en: "Live streaming" },
   "pillars.live.body": {
-    sv: "Multikamera-produktion och regi i realtid. Evenemang, sport samt lite andra grejer vi inte kan visa än.",
-    en: "Multi-camera production and real-time switching. Events, sport, and a few other things we can't show yet."
+    sv: "Vi kör flera kameror samtidigt och klipper live, i realtid. Evenemang, sport samt lite andra grejer vi inte kan visa än.",
+    en: "We run multiple cameras at once and switch live, in real time. Events, sport, and a few other things we can't show yet."
   },
 
   "projects.heading": { sv: "Senaste från studion.", en: "Latest from the studio." },
