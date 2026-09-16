@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A+ Studios | Film, musik, spel & livesändning</title>
+<meta name="description" content="A+ Studios är en multimediastudio i Alingsås som gör film, musik, Roblox-spel och livesändningar.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=Archivo+Black&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+
+<header class="site-header" id="top">
+  <a href="/home" class="brand" aria-label="A+ Studios, till startsidan">
+    <span class="brand-mark">A<span class="plus">+</span></span>
+  </a>
+
+<nav class="main-nav" id="mainNav">
+  <a href="/home" class="active" data-i18n="nav.home">Hem</a>
+  <a href="/om-oss" data-i18n="nav.about">Om oss</a>
+  <a href="/projekt" data-i18n="nav.projects">Projekt</a>
+  <a href="/utrustning" data-i18n="nav.gear">Utrustning</a>
+  <a href="/anlita" data-i18n="nav.hire">Anlita</a>
+  <a href="/kontakt" class="nav-cta" data-i18n="nav.contact">Kontakt</a>
+</nav>
+
+  <div class="header-controls">
+    <button class="lang-toggle" id="langToggle" aria-label="Byt språk / Switch language">
+      <span class="lang-sv">SV</span><span class="lang-sep">/</span><span class="lang-en">EN</span>
+    </button>
+    <button class="menu-toggle" id="menuToggle" aria-label="Meny" aria-expanded="false" aria-controls="mainNav">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main>
+
+  <!-- ===== HERO (pinned, layered parallax) ===== -->
+  <section class="hero" id="hero">
+    <div class="hero-bg" style="background-image:url('jonathan2-chase-bank.png')"></div>
+    <div class="hero-scrim"></div>
+    <div class="hero-content">
+      <h1 class="hero-mark" aria-label="A+ Studios">
+        <span class="hm-a">A<span class="plus">+</span></span>
+        <span class="hm-studios">STUDIOS</span>
+      </h1>
+      <p class="hero-tagline" data-i18n="hero.tagline">Film. Musik. Spel. Live. Fyra kategorier, en studio.</p>
+      <div class="hero-ctas">
+        <a href="/projekt" class="btn btn-primary" data-i18n="hero.cta1">Se vårt arbete</a>
+        <a href="/kontakt" class="btn btn-ghost" data-i18n="hero.cta2">Boka oss</a>
+      </div>
+    </div>
+    <div class="scroll-cue" aria-hidden="true"><span></span></div>
+  </section>
+
+  <!-- ===== SHORT INTRO ===== -->
+  <section class="story story--short">
+    <div class="story-inner">
+      <p class="eyebrow-plain" data-i18n="story.location">Alingsås, Sverige</p>
+      <h2 data-i18n="story.heading">Från skolkorridoren till skärmen.</h2>
+      <p class="story-body" data-i18n="story.teaser">Vi är ett gäng högstadiekompisar i Alingsås som gör film, musik, spel och livesändningar tillsammans. Grundades 2021, och vi tar det här på fullaste allvar.</p>
+      <a href="/om-oss" class="text-link" data-i18n="story.readmore">Läs hela historien →</a>
+    </div>
+  </section>
+
+  <!-- ===== PILLARS ===== -->
+  <section class="pillars" id="pillars">
+    <h2 data-i18n="pillars.heading">Fyra uppgifter.</h2>
+
+    <div class="pillar-grid">
+      <article class="pillar pillar--film">
+        <div class="pillar-media" style="background-image:url('jonathan2-run.png')"></div>
+        <div class="pillar-copy">
+          <h3 data-i18n="pillars.film.title">Filmproduktion</h3>
+          <p data-i18n="pillars.film.body">Vi skriver, filmar och klipper. Allt från kortfilm till reklam.</p>
+        </div>
+      </article>
+
+      <article class="pillar pillar--music">
+        <div class="pillar-media" style="background-image:url('musik.png')"></div>
+        <div class="pillar-copy">
+          <h3 data-i18n="pillars.music.title">Musikproduktion</h3>
+          <p data-i18n="pillars.music.body">Låtar för spel och filmer, plus egna releaser under artistnamnet Jaderwave.</p>
+        </div>
+      </article>
+
+      <article class="pillar pillar--game">
+        <div class="pillar-media" style="background-image:url('spel.png')"></div>
+        <div class="pillar-copy">
+          <h3 data-i18n="pillars.game.title">Spelutveckling</h3>
+          <p data-i18n="pillars.game.body">Olika spel på olika motorer. Roblox, Unreal Engine och Unity.</p>
+        </div>
+      </article>
+
+      <article class="pillar pillar--live">
+        <div class="pillar-media" style="background-image:url('live.png')"></div>
+        <div class="pillar-copy">
+          <h3 data-i18n="pillars.live.title">Livesändning</h3>
+          <p data-i18n="pillars.live.body">Vi kör flera kameror samtidigt och klipper live, i realtid. Evenemang, sport samt lite andra grejer vi inte kan visa än.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ===== PROJECT SPOTLIGHT ===== -->
+  <section class="projects projects--teaser">
+    <h2 data-i18n="projects.heading">Senaste från studion.</h2>
+
+    <article class="project project--noom2026">
+      <div class="project-media">
+        <a href="https://www.youtube.com/@NickeLurig" target="_blank" rel="noopener" class="video-thumb" aria-label="Se Nån Väckte Tigern I Mig på YouTube">
+          <img src="noomaraton2026-tiger.png" alt="Stillbild ur Nån Väckte Tigern I Mig, person i tigerdräkt mot svart bakgrund" loading="lazy">
+          <span class="play-btn" aria-hidden="true"></span>
+        </a>
+      </div>
+      <div class="project-copy">
+        <p class="project-kicker" data-i18n="projects.noom26.kicker">Noomaraton 2026</p>
+        <h3 data-edit="noom26.title">Nån Väckte Tigern I Mig</h3>
+        <p data-i18n="projects.noom26.body">Vårt bidrag till Noomaraton 2026 i Västra Götaland. Handlar om en man som köper en mystisk dricka som transformerar han till en kaos-sökande tiger.</p>
+        <a href="https://www.youtube.com/@NickeLurig" target="_blank" rel="noopener" class="text-link" data-i18n="projects.watch">Se filmen →</a>
+      </div>
+    </article>
+
+    <div class="page-link-strip">
+      <p data-i18n="home.morelink">MAYDAY, Jonathan, Noomaraton och Jaderwave samlat på ett ställe.</p>
+      <a href="/projekt" class="btn btn-ghost" data-i18n="home.moreprojects">Alla projekt</a>
+    </div>
+  </section>
+
+  <!-- ===== MINI CONTACT CTA ===== -->
+  <section class="contact contact--strip">
+    <div class="contact-inner">
+      <h2 data-i18n="contact.heading">Vill du göra något med oss?</h2>
+      <p data-i18n="contact.body">Film, musik, spel eller en livesändning som faktiskt fungerar.</p>
+      <a href="/kontakt" class="btn btn-primary btn-lg" data-i18n="home.contactcta">Kom i kontakt</a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <span class="brand-mark small">A<span class="plus">+</span></span>
+  <p data-i18n="footer.text">© 2026 A+ Studios, Alingsås.</p>
+  <div class="footer-links">
+    <a href="https://www.tiktok.com/@aplus.studios" target="_blank" rel="noopener">TikTok</a>
+    <a href="https://www.youtube.com/@A-plus-studios" target="_blank" rel="noopener">YouTube</a>
+    <a href="mailto:hej@aplusfilm.se">Mail</a>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

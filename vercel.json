@@ -5,6 +5,10 @@
       "dest": "/index.html"
     },
     {
+      "src": "/home",
+      "dest": "/home.html"
+    },
+    {
       "src": "/om-oss",
       "dest": "/om-oss.html"
     },
