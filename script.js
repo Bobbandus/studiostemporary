@@ -181,7 +181,7 @@ const translations = {
     en: "Film, music, games, or a livestream that actually works. Reach out and let's talk about what it could be."
   },
   "contact.cta": { sv: "Maila oss", en: "Email us" },
-  "contact.alt": { sv: "hej@aplusfilm.se", en: "hej@aplusfilm.se" },
+  "contact.alt": { sv: "jajamensanbobban@gmail.com", en: "jajamensanbobban@gmail.com" },
   "contact.social": { sv: "Sociala medier & kanaler", en: "Social & channels" },
   "contact.followcrew": { sv: "Följ studion", en: "Follow the studio" },
   "contact.followbob": { sv: "Följ Bob", en: "Follow Bob" },
