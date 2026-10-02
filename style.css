@@ -752,3 +752,31 @@ main section h2{
 .linktree-foot{ margin-top:40px; color: var(--text-muted); font-size:0.8rem; line-height:1.6; }
 
 .made-note{ display:inline-block; margin-top:6px; font-family: var(--font-body); font-size:0.78rem; }
+
+/* ==========================================================================
+   Calmer pass: plain nav, flat buttons, small radii, no glow, no tracked caps
+   ========================================================================== */
+@media (min-width: 821px){
+  .main-nav{
+    padding:0; border-radius:0; background:none; border:0; box-shadow:none;
+    -webkit-backdrop-filter:none; backdrop-filter:none;
+  }
+}
+.main-nav a{ text-transform:none; letter-spacing:0; font-family: var(--font-body); font-size:0.95rem; }
+.main-nav a.nav-cta{ border-radius:3px; box-shadow:none; }
+.main-nav a.nav-cta:hover{ transform:none; box-shadow:none; background:#fff; }
+.lang-toggle{ border-radius:3px; box-shadow:none; background:none; -webkit-backdrop-filter:none; backdrop-filter:none; }
+
+.btn{ text-transform:none; letter-spacing:0; }
+.btn-primary, .btn-ghost{ box-shadow:none; }
+.btn-primary:hover, .btn-ghost:hover{ transform:none; box-shadow:none; }
+.btn-primary:hover{ background:#fff; }
+
+.tier, .svc, .job-card, .job-empty, .idea-list, .community-card{ border-radius:4px; }
+
+/* mono caps labels -> quiet body text */
+.eyebrow-plain, .pbanner-kicker, .gear-cat h4{
+  text-transform:none; letter-spacing:0; font-family: var(--font-body); font-weight:600;
+}
+.eyebrow-plain::before{ content:none; }
+.timeline li::before{ box-shadow:none; }
