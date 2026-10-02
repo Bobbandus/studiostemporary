@@ -186,7 +186,8 @@ const translations = {
   "contact.followcrew": { sv: "Följ studion", en: "Follow the studio" },
   "contact.followbob": { sv: "Följ Bob", en: "Follow Bob" },
 
-  "footer.text": { sv: "© 2026 A+ Studios, Alingsås.", en: "© 2026 A+ Studios, Alingsås." }
+  "footer.text": { sv: "© 2026 A+ Studios, Alingsås.", en: "© 2026 A+ Studios, Alingsås." },
+  "footer.ai": { sv: "byggt med ai för jag har inte lust att lära mig ett nytt programmeringsspråk...", en: "built with AI because I can't be bothered to learn a new programming language..." }
 };
 
 /* ==========================================================================
