@@ -2,8 +2,9 @@
 <html lang="sv">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#000000">
 <title>Spelar upp | A+ Vault</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,44 +12,167 @@
 <link rel="stylesheet" href="/style.css">
 <link rel="stylesheet" href="/vault.css">
 </head>
-<body>
+<body class="vault-body vault-watch">
 
-<div class="grain" aria-hidden="true"></div>
+<div class="player is-paused is-active" id="player">
+  <video id="vaultPlayer" playsinline preload="metadata"></video>
 
-<header class="vault-nav">
-  <a href="/vault" class="brand" aria-label="Tillbaka till A+ Vault">
-    <span class="brand-mark">A<span class="plus">+</span></span>
-  </a>
-  <div class="vault-nav-links">
-    <span class="vault-nav-tag">VAULT</span>
-    <div class="vault-profile" aria-hidden="true">
-      <span class="vault-profile-badge">A+</span>
+  <div class="player-spinner" id="playerSpinner" hidden><span></span></div>
+
+  <button type="button" class="player-bigplay" id="playerBigPlay" aria-label="Spela upp" hidden>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path class="fill" d="M7 4.5v15l12.5-7.5z"/></svg>
+  </button>
+
+  <div class="player-flash" id="playerFlash" aria-hidden="true"></div>
+
+  <div class="player-top">
+    <a href="/vault" class="player-icon-btn player-back" id="playerBack" aria-label="Tillbaka till Vault" title="Tillbaka">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 5l-7 7 7 7"/></svg>
+    </a>
+    <div class="player-top-title" id="playerTopTitle"></div>
+  </div>
+
+  <div class="player-touch" aria-hidden="true">
+    <button type="button" class="player-icon-btn" data-seek="-10" tabindex="-1">
+      <svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.5-5.8"/><path d="M4 4v4.5h4.5"/><text x="12" y="15.2">10</text></svg>
+    </button>
+    <button type="button" class="player-icon-btn player-touch-play" data-toggle tabindex="-1">
+      <svg class="icon-play" viewBox="0 0 24 24"><path class="fill" d="M7 4.5v15l12.5-7.5z"/></svg>
+      <svg class="icon-pause" viewBox="0 0 24 24"><path class="fill" d="M6.5 4.5h4v15h-4zM13.5 4.5h4v15h-4z"/></svg>
+    </button>
+    <button type="button" class="player-icon-btn" data-seek="10" tabindex="-1">
+      <svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.5-5.8"/><path d="M20 4v4.5h-4.5"/><text x="12" y="15.2">10</text></svg>
+    </button>
+  </div>
+
+  <button type="button" class="player-skip" id="playerSkipIntro" hidden>Hoppa över intro</button>
+
+  <div class="player-next" id="playerNext" hidden>
+    <div class="player-next-art"><img id="playerNextImg" alt=""></div>
+    <div class="player-next-text">
+      <p class="player-next-kicker">Nästa avsnitt</p>
+      <p class="player-next-title" id="playerNextTitle"></p>
+      <div class="player-next-actions">
+        <button type="button" class="player-next-play" id="playerNextPlay">
+          <span class="player-next-fill" id="playerNextFill"></span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path class="fill" d="M7 4.5v15l12.5-7.5z"/></svg>
+          <span id="playerNextLabel">Nästa avsnitt</span>
+        </button>
+        <button type="button" class="player-next-dismiss" id="playerNextDismiss">Se eftertexterna</button>
+      </div>
     </div>
   </div>
-</header>
 
-<main>
-
-  <div class="vault-player-wrap">
-    <video id="vaultPlayer" controls preload="metadata"></video>
+  <div class="player-end" id="playerEnd" hidden>
+    <div class="player-end-inner">
+      <p class="player-end-kicker">Du har sett klart</p>
+      <h2 id="playerEndTitle"></h2>
+      <div class="player-end-actions">
+        <button type="button" class="vault-btn vault-btn-play" id="playerReplay">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.5-5.8"/><path d="M4 4v4.5h4.5"/></svg>
+          <span>Se igen</span>
+        </button>
+        <a href="/vault" class="vault-btn vault-btn-info" id="playerEndBack">Tillbaka till Vault</a>
+      </div>
+      <div class="player-end-more" id="playerEndMore" hidden>
+        <p class="player-end-more-heading">Mer från A+</p>
+        <div class="player-end-grid" id="playerEndGrid"></div>
+      </div>
+    </div>
   </div>
 
-  <section class="vault-watch-info">
-    <h1 id="watchTitle">Laddar…</h1>
-    <p id="watchSynopsis"></p>
-  </section>
+  <div class="player-panel" id="playerEpisodes" hidden>
+    <div class="player-panel-head">
+      <p id="playerEpisodesHeading">Avsnitt</p>
+      <button type="button" class="player-icon-btn player-panel-close" data-panel-close aria-label="Stäng">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <ol class="player-episode-list" id="playerEpisodeList"></ol>
+  </div>
 
-  <section class="vault-episode-list" id="watchEpisodes" hidden>
-    <h2>Avsnitt</h2>
-    <ul id="watchEpisodeItems" style="list-style:none; padding:0; margin:0;"></ul>
-  </section>
+  <div class="player-panel player-panel--small" id="playerSettings" hidden>
+    <div class="player-panel-head">
+      <p>Uppspelning</p>
+      <button type="button" class="player-icon-btn player-panel-close" data-panel-close aria-label="Stäng">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <div class="player-settings-group" id="playerSubsGroup" hidden>
+      <p class="player-settings-label">Undertexter</p>
+      <div class="player-chip-row" id="playerSubsOptions"></div>
+    </div>
+    <div class="player-settings-group">
+      <p class="player-settings-label">Hastighet</p>
+      <div class="player-chip-row" id="playerSpeedOptions"></div>
+    </div>
+  </div>
 
-</main>
+  <div class="player-bottom">
+    <div class="player-scrub" id="playerScrub" role="slider" tabindex="0" aria-label="Tidslinje" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0">
+      <div class="player-scrub-track">
+        <span class="player-scrub-buffered" id="playerBuffered"></span>
+        <span class="player-scrub-played" id="playerPlayed"></span>
+        <span class="player-scrub-intro" id="playerIntroMark" hidden></span>
+        <span class="player-scrub-thumb" id="playerThumb"></span>
+      </div>
+      <span class="player-scrub-tooltip" id="playerScrubTip" hidden>0:00</span>
+    </div>
+    <span class="player-time" id="playerTime">0:00</span>
 
-<footer class="vault-footer">
-  © 2026 A+ Studios, Alingsås.
-</footer>
+    <div class="player-controls">
+      <div class="player-controls-left">
+        <button type="button" class="player-icon-btn" id="playerToggle" aria-label="Spela upp (k)" title="Spela upp (k)">
+          <svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true"><path class="fill" d="M7 4.5v15l12.5-7.5z"/></svg>
+          <svg class="icon-pause" viewBox="0 0 24 24" aria-hidden="true"><path class="fill" d="M6.5 4.5h4v15h-4zM13.5 4.5h4v15h-4z"/></svg>
+        </button>
+        <button type="button" class="player-icon-btn" data-seek="-10" aria-label="Spola tillbaka 10 sekunder (←)" title="−10 s (←)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.5-5.8"/><path d="M4 4v4.5h4.5"/><text x="12" y="15.2">10</text></svg>
+        </button>
+        <button type="button" class="player-icon-btn" data-seek="10" aria-label="Spola framåt 10 sekunder (→)" title="+10 s (→)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.5-5.8"/><path d="M20 4v4.5h-4.5"/><text x="12" y="15.2">10</text></svg>
+        </button>
+        <div class="player-volume">
+          <button type="button" class="player-icon-btn" id="playerMute" aria-label="Stäng av ljud (m)" title="Ljud (m)">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path class="fill" d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/>
+              <path class="vol-wave1" d="M15.5 9.5a3.5 3.5 0 0 1 0 5"/>
+              <path class="vol-wave2" d="M18 7a7 7 0 0 1 0 10"/>
+              <path class="vol-x" d="m16 9.5 5 5m0-5-5 5"/>
+            </svg>
+          </button>
+          <input type="range" class="player-volume-slider" id="playerVolume" min="0" max="1" step="0.05" value="1" aria-label="Volym">
+        </div>
+      </div>
+
+      <div class="player-controls-title" id="playerTitle"></div>
+
+      <div class="player-controls-right">
+        <button type="button" class="player-icon-btn" id="playerNextBtn" aria-label="Nästa avsnitt (n)" title="Nästa avsnitt (n)" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path class="fill" d="M5 5v14l10-7z"/><path d="M18.5 5v14"/></svg>
+        </button>
+        <button type="button" class="player-icon-btn" id="playerEpisodesBtn" aria-label="Avsnitt" title="Avsnitt" aria-controls="playerEpisodes" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="13" height="12" rx="1.5"/><path d="M7 4h12.5A1.5 1.5 0 0 1 21 5.5V15"/></svg>
+        </button>
+        <button type="button" class="player-icon-btn" id="playerSettingsBtn" aria-label="Undertexter och hastighet" title="Undertexter och hastighet" aria-controls="playerSettings">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 11.5h3M12.5 11.5H17M7 15h6M15.5 15H17"/></svg>
+        </button>
+        <button type="button" class="player-icon-btn" id="playerFullscreen" aria-label="Helskärm (f)" title="Helskärm (f)">
+          <svg class="icon-expand" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>
+          <svg class="icon-shrink" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="player-error" id="playerError" hidden>
+    <p class="player-error-kicker">Något gick fel</p>
+    <h1 id="playerErrorTitle">Videon kunde inte spelas upp.</h1>
+    <a href="/vault" class="vault-btn vault-btn-play">Tillbaka till Vault</a>
+  </div>
+</div>
 
 <script src="/vault.js"></script>
+<script src="/vault-player.js"></script>
 </body>
 </html>

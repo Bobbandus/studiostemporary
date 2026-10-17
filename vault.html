@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0b0b0c">
 <title>A+ Vault | A+ Studios</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,37 +12,61 @@
 <link rel="stylesheet" href="/style.css">
 <link rel="stylesheet" href="/vault.css">
 </head>
-<body>
+<body class="vault-body">
 
-<div class="grain" aria-hidden="true"></div>
-
-<header class="vault-nav">
+<header class="vault-nav" id="vaultNav">
   <a href="/" class="brand" aria-label="A+ Studios, till startsidan">
     <span class="brand-mark">A<span class="plus">+</span></span>
   </a>
-  <div class="vault-nav-links">
-    <span class="vault-nav-tag">VAULT</span>
-    <div class="vault-profile" aria-hidden="true">
-      <span class="vault-profile-badge">A+</span>
+  <nav class="vault-nav-links" aria-label="Bläddra i valvet">
+    <a href="/vault" data-view="hem" class="active">Hem</a>
+    <a href="/vault?visa=serier" data-view="serier">Serier</a>
+    <a href="/vault?visa=filmer" data-view="filmer">Filmer</a>
+    <a href="/vault?visa=min-lista" data-view="min-lista">Min lista</a>
+  </nav>
+  <div class="vault-nav-right">
+    <div class="vault-searchbox" id="vaultSearchBox">
+      <button type="button" class="vault-icon-btn" id="vaultSearchToggle" aria-label="Sök" aria-controls="vaultSearch">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>
+      </button>
+      <input type="search" id="vaultSearch" placeholder="Titlar, genrer" aria-label="Sök i valvet" autocomplete="off" tabindex="-1">
     </div>
+    <span class="vault-profile-badge" aria-hidden="true">A+</span>
   </div>
 </header>
 
-<main>
+<main id="vaultMain">
+
+  <div class="vault-skeleton" id="vaultSkeleton" aria-hidden="true">
+    <div class="vault-skeleton-hero"></div>
+    <div class="vault-skeleton-row"><span></span><span></span><span></span><span></span><span></span></div>
+  </div>
 
   <section class="vault-hero" id="vaultHero" hidden>
-    <div class="vault-hero-bg" id="vaultHeroBg"></div>
+    <div class="vault-hero-media">
+      <div class="vault-hero-bg" id="vaultHeroBg"></div>
+      <video class="vault-hero-trailer" id="vaultHeroTrailer" muted playsinline preload="none" aria-hidden="true"></video>
+    </div>
     <div class="vault-hero-scrim"></div>
     <div class="vault-hero-content">
       <p class="vault-hero-kicker" id="vaultHeroKicker">Film</p>
       <h1 id="vaultHeroTitle"></h1>
-      <p class="vault-hero-desc" id="vaultHeroDesc"></p>
       <p class="vault-hero-meta" id="vaultHeroMeta"></p>
+      <p class="vault-hero-desc" id="vaultHeroDesc"></p>
       <div class="vault-hero-ctas">
-        <a href="#" id="vaultHeroPlay" class="btn btn-primary btn-lg">Spela upp</a>
-        <a href="#vaultCategories" class="btn btn-ghost btn-lg">Bläddra i valvet</a>
+        <a href="#" id="vaultHeroPlay" class="vault-btn vault-btn-play">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path class="fill" d="M7 4.5v15l12.5-7.5z"/></svg>
+          <span id="vaultHeroPlayLabel">Spela upp</span>
+        </a>
+        <button type="button" id="vaultHeroInfo" class="vault-btn vault-btn-info">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg>
+          <span>Mer info</span>
+        </button>
       </div>
     </div>
+    <button type="button" class="vault-hero-mute" id="vaultHeroMute" aria-label="Slå på ljud" hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path class="mute-x" d="m16 9.5 5 5m0-5-5 5"/></svg>
+    </button>
   </section>
 
   <section class="vault-empty" id="vaultEmpty" hidden>
@@ -55,20 +80,71 @@
     </ol>
   </section>
 
-  <div class="vault-grid-section" id="vaultContinueRow" hidden>
-    <div class="vault-row">
-      <p class="vault-row-heading">Fortsätt titta</p>
-      <div class="vault-row-track" id="vaultContinueTrack"></div>
-    </div>
-  </div>
+  <div class="vault-rows" id="vaultRows"></div>
 
-  <section class="vault-search" id="vaultSearchSection">
-    <input type="search" id="vaultSearch" placeholder="Sök i valvet…" aria-label="Sök i valvet">
+  <section class="vault-grid-view" id="vaultGridView" hidden>
+    <h1 class="vault-grid-heading" id="vaultGridHeading"></h1>
+    <p class="vault-grid-empty" id="vaultGridEmpty" hidden></p>
+    <div class="vault-grid" id="vaultGrid"></div>
   </section>
 
-  <div class="vault-grid-section" id="vaultCategories"></div>
-
 </main>
+
+<div class="vault-preview" id="vaultPreview" hidden></div>
+
+<div class="vault-modal" id="vaultModal" hidden>
+  <div class="vault-modal-backdrop" data-modal-close></div>
+  <div class="vault-modal-card" role="dialog" aria-modal="true" aria-labelledby="vaultModalTitle" tabindex="-1">
+    <button type="button" class="vault-modal-close" data-modal-close aria-label="Stäng">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+    </button>
+    <div class="vault-modal-hero">
+      <div class="vault-modal-hero-bg" id="vaultModalBg"></div>
+      <div class="vault-modal-hero-scrim"></div>
+      <div class="vault-modal-hero-content">
+        <h2 id="vaultModalTitle"></h2>
+        <div class="vault-modal-actions">
+          <a href="#" class="vault-btn vault-btn-play" id="vaultModalPlay">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path class="fill" d="M7 4.5v15l12.5-7.5z"/></svg>
+            <span id="vaultModalPlayLabel">Spela upp</span>
+          </a>
+          <span class="vault-modal-list-slot" id="vaultModalListSlot"></span>
+          <a href="#" class="vault-round-btn" id="vaultModalRestart" aria-label="Börja om från början" title="Börja om" hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.5-5.8"/><path d="M4 4v4.5h4.5"/></svg>
+          </a>
+        </div>
+        <div class="vault-modal-progress" id="vaultModalProgress" hidden>
+          <span class="vault-progress-bar"><span id="vaultModalProgressFill"></span></span>
+          <span id="vaultModalProgressText"></span>
+        </div>
+      </div>
+    </div>
+    <div class="vault-modal-body">
+      <div class="vault-modal-info">
+        <div class="vault-modal-main">
+          <p class="vault-modal-meta" id="vaultModalMeta"></p>
+          <p class="vault-modal-synopsis" id="vaultModalSynopsis"></p>
+        </div>
+        <dl class="vault-modal-side" id="vaultModalSide"></dl>
+      </div>
+      <section class="vault-modal-section" id="vaultModalEpisodes" hidden>
+        <div class="vault-modal-section-head">
+          <h3>Avsnitt</h3>
+          <span id="vaultModalEpisodeCount"></span>
+        </div>
+        <ol class="vault-episodes" id="vaultModalEpisodeList"></ol>
+      </section>
+      <section class="vault-modal-section" id="vaultModalMore" hidden>
+        <h3>Mer som detta</h3>
+        <div class="vault-more-grid" id="vaultModalMoreGrid"></div>
+      </section>
+      <section class="vault-modal-section vault-modal-about" id="vaultModalAbout">
+        <h3 id="vaultModalAboutHeading"></h3>
+        <dl id="vaultModalAboutList"></dl>
+      </section>
+    </div>
+  </div>
+</div>
 
 <footer class="vault-footer">
   © 2026 A+ Studios, Alingsås.
