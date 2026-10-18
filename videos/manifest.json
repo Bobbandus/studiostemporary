@@ -43,5 +43,8 @@
       "top": 3,
       "video": "/videos/ident.mp4"
     }
+  ],
+  "lives": [
+    { "youtube": "https://www.youtube.com/watch?v=6Y8ciHSL7dI" }
   ]
 }

@@ -4,9 +4,15 @@ Vault är sidan `/vault` (inte länkad i huvudmenyn — bara den som har länken
 `videos/manifest.json` och listar/spelar allt som står där. Att bara lägga en mp4-fil i en mapp gör
 ingenting av sig själv — filen måste också få en rad i `manifest.json`.
 
-Sidan är byggd som en streamingtjänst: stor hero-banner, rader med kort, hover-förhandsvisning,
-info-ruta med avsnitt och "Mer som detta", "Fortsätt titta", "Min lista", sök, och en egen
-helskärmsspelare med "Hoppa över intro" och nedräkning till nästa avsnitt. Allt styrs av manifestet.
+Sidan har en sidomeny med sök och två sektioner:
+
+- **01 Film** — våra egna filmer och serier (`"titles"` i manifestet): utvalt-banner, rader,
+  hover-förhandsvisning, info-ruta med avsnitt och "Mer som detta", "Fortsätt titta", "Min lista"
+  och en egen helskärmsspelare med "Hoppa över intro" och nedräkning till nästa avsnitt.
+- **02 Live** — ett bibliotek med livesändningar från YouTube (`"lives"` i manifestet). De spelas i
+  ett teaterläge direkt på sidan (`/vault?visa=live`).
+
+Allt styrs av manifestet.
 
 ## Lägg till en film
 
@@ -80,7 +86,42 @@ Samma sak, men lägg flera mp4-filer i mappen och beskriv varje avsnitt separat:
 | `director` | film/serie | Valfritt namn (eller lista) för "Regi". |
 | `episodes` | serie | Lista med avsnitt, se exemplet ovan. Sorteras på `episode`. |
 
-Vault innehåller bara riktiga film/serie-projekt (inget om musik, spel eller livesändning) — håll det så.
+Under `"titles"` ligger bara riktiga film/serie-projekt — livesändningar hör hemma under `"lives"`.
+
+## Lägg till en livesändning
+
+Klistra in YouTube-länken under `"lives"` i `manifest.json`. Det räcker — tumnageln hämtas från
+YouTube, och titeln slås upp automatiskt i besökarens webbläsare (via oEmbed, sparas en vecka).
+Vill du bestämma titeln själv, eller om uppslaget inte fungerar, skriv in `title`:
+
+```json
+"lives": [
+  { "youtube": "https://www.youtube.com/watch?v=6Y8ciHSL7dI" },
+  {
+    "youtube": "https://www.youtube.com/watch?v=XXXXXXXXXXX",
+    "title": "Skolans vårkonsert 2026",
+    "date": "2026-05-28",
+    "category": "Event",
+    "duration": 5400,
+    "description": "Tre kameror, klippt live."
+  }
+]
+```
+
+| Fält | Beskrivning |
+|---|---|
+| `youtube` | Länken eller bara video-ID:t. En `t=` i länken ignoreras — använd `start` om sändningen ska börja en bit in. |
+| `title` | Valfri. Utan den hämtas YouTube-titeln automatiskt (visas som "Livesändning" tills den är hämtad). |
+| `date` | `ÅÅÅÅ-MM-DD`. Finns datum sorteras biblioteket nyast först, annars i manifestets ordning. |
+| `category` | T.ex. `"Sport"`, `"Event"`, `"Konsert"`. När det finns minst två kategorier dyker filterknappar upp. |
+| `duration` | Längd i sekunder (visas som tidskod på kortet). |
+| `description` | Visas under spelaren. |
+| `start` | Sekund att börja på. |
+| `thumbnail` | Egen bild istället för YouTubes tumnagel. |
+| `channel` | Kanalnamn att visa (annars YouTubes). |
+
+Sändningen måste tillåta inbäddning på YouTube; annars visar spelaren ett fel och "Öppna på YouTube"
+fungerar fortfarande.
 
 ## Bilder
 
@@ -100,7 +141,7 @@ Vault använder komprimerade bilder i `vault-art/` istället för de stora origi
   N = nästa avsnitt, S = hoppa över intro, Esc = stäng meny.
 - Mobil: tryck för att visa/dölja kontrollerna, dubbeltryck på vänster/höger sida för ±10 s.
 - Länka till en viss tid med `?t=` i sekunder, t.ex. `/vault/jonathan?ep=2&t=90`.
-- Länka direkt till en titels info-ruta: `/vault?titel=<slug>`.
+- Länka direkt till en titels info-ruta: `/vault?titel=<slug>`, eller en sändning: `/vault?visa=live&live=<youtube-id>`.
 
 ## Just nu
 
