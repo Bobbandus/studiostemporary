@@ -4,12 +4,15 @@ Vault är sidan `/vault` (inte länkad i huvudmenyn — bara den som har länken
 `videos/manifest.json` och listar/spelar allt som står där. Att bara lägga en mp4-fil i en mapp gör
 ingenting av sig själv — filen måste också få en rad i `manifest.json`.
 
-Sidan har en sidomeny med sök och två sektioner:
+Vault har en egen look, skild från resten av sajten (egna typsnitt och färger, laddar inte
+`style.css`). På dator finns en sidomeny med sök, Hem, Serier, Filmer, Min lista och Live-arkivet;
+på mobil en flikmeny i botten (Hem, Sök, Live, Min lista).
 
-- **01 Film** — våra egna filmer och serier (`"titles"` i manifestet): utvalt-banner, rader,
-  hover-förhandsvisning, info-ruta med avsnitt och "Mer som detta", "Fortsätt titta", "Min lista"
-  och en egen helskärmsspelare med "Hoppa över intro" och nedräkning till nästa avsnitt.
-- **02 Live** — ett bibliotek med livesändningar från YouTube (`"lives"` i manifestet). De spelas i
+- **Film** — våra egna filmer och serier (`"titles"` i manifestet): en karusell överst som byter
+  titel av sig själv, rader ("Fortsätt titta", "Utforska", topplista, "Nytt i valvet", genrer),
+  en titelsida med flikarna Avsnitt / Mer som detta / Detaljer, och en egen helskärmsspelare med
+  "Hoppa över intro" och nedräkning till nästa avsnitt. Sidans bakgrund tar färg från bilden som visas.
+- **Live** — ett bibliotek med livesändningar från YouTube (`"lives"` i manifestet). De spelas i
   ett teaterläge direkt på sidan (`/vault?visa=live`).
 
 Allt styrs av manifestet.
@@ -76,9 +79,9 @@ Samma sak, men lägg flera mp4-filer i mappen och beskriv varje avsnitt separat:
 | `genres` | film/serie | Lista med genrer. En genre som samlar minst två (men inte alla) titlar får en egen rad. Används också i sök och "Mer som detta". |
 | `duration` | film/avsnitt | Längd i sekunder (visas som "5 min"). |
 | `video` | film/avsnitt | Sökväg till mp4-filen **med inledande `/`** (t.ex. `/videos/mitt-projekt/mitt-projekt.mp4`). Utan `/` i början letar sidan på fel ställe när den öppnas via `/vault/<slug>`. |
-| `featured` | film/serie | `true` = kan visas i hero-bannern. Flera titlar får ha det — då slumpas en per besök. Saknas det helt visas första titeln. |
+| `featured` | film/serie | `true` = med i karusellen överst (först i ordningen). Titlar med `top` fyller på efter dem. |
 | `top` | film/serie | Plats i raden "Topp N i valvet" (1, 2, 3…). Raden visas när minst tre titlar har `top`. |
-| `trailer` | film/serie | Valfri kort mp4 som spelas upp tyst i hero-bannern efter ett par sekunder (med ljudknapp). |
+| `trailer` | film/serie | Valfri kort mp4 som spelas upp tyst i karusellen efter ett par sekunder (med ljudknapp). |
 | `intro` | film/avsnitt | `{ "start": 0, "end": 12 }` i sekunder — visar knappen "Hoppa över intro" under det intervallet. |
 | `credits` | avsnitt | Sekund där eftertexterna börjar. Då dyker "Nästa avsnitt" upp med nedräkning. Utan fältet visas den de sista 15 sekunderna. |
 | `subtitles` | film/avsnitt | `[{ "src": "/videos/mitt-projekt/sv.vtt", "lang": "sv", "label": "Svenska" }]` — WebVTT-filer, väljs i spelarens meny. |
@@ -141,7 +144,7 @@ Vault använder komprimerade bilder i `vault-art/` istället för de stora origi
   N = nästa avsnitt, S = hoppa över intro, Esc = stäng meny.
 - Mobil: tryck för att visa/dölja kontrollerna, dubbeltryck på vänster/höger sida för ±10 s.
 - Länka till en viss tid med `?t=` i sekunder, t.ex. `/vault/jonathan?ep=2&t=90`.
-- Länka direkt till en titels info-ruta: `/vault?titel=<slug>`, eller en sändning: `/vault?visa=live&live=<youtube-id>`.
+- Länka direkt till en titelsida: `/vault?titel=<slug>`, en genre: `/vault?visa=genre&genre=noomaraton`, eller en sändning: `/vault?visa=live&live=<youtube-id>`.
 
 ## Just nu
 

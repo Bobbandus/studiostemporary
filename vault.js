@@ -249,32 +249,34 @@ function formatLiveDate(date){
   return new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString("sv-SE", { day: "numeric", month: "short", year: "numeric" });
 }
 
+function countLabel(n, one, many){ return n + " " + (n === 1 ? one : many); }
+
 /* ==========================================================================
    BROWSE PAGE (vault.html)
    ========================================================================== */
 
-const VAULT_VIEWS = { serier: "Serier", filmer: "Filmer", "min-lista": "Min lista", live: "Live" };
+const VAULT_VIEWS = { serier: "Serier", filmer: "Filmer", "min-lista": "Min lista", live: "Live", sok: "Sök", genre: "Genre" };
+const HERO_INTERVAL = 9000;
+const CURRENT_YEAR = new Date().getFullYear();
 
 const vault = {
   manifest: null,
   view: "hem",
-  kategori: "",
+  kategori: "",   // live category (?visa=live&kategori=)
+  genre: "",      // film genre (?visa=genre&genre=)
   query: "",
-  heroEntry: null,
-  heroView: null,
-  overlay: null,         // { kind: "titel" | "live", key }
+  overlay: null,  // { kind: "titel" | "live", key }
   overlayPushed: false,
   lastFocus: null,
   liveMeta: {},
-  previewTimer: 0,
-  rowsDirty: false,
   rowSyncs: [],
-  routed: false,
-  trailerTimer: 0
+  routed: false
 };
 
-const canHoverPreview = window.matchMedia("(hover: hover) and (pointer: fine)");
+const hero = { view: null, slides: [], nodes: [], index: 0, timer: 0, deadline: 0, remaining: HERO_INTERVAL, holds: {}, trailerTimer: 0 };
+
 const sidebarDocked = window.matchMedia("(min-width: 900px)");
+const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 /* ---------- live helpers ---------- */
 
@@ -365,7 +367,18 @@ async function hydrateLives(){
   if (vault.query) renderView();  // freshly known titles are searchable now
 }
 
-/* ---------- play button state ---------- */
+/* ---------- film helpers ---------- */
+
+function filmGenres(titles){
+  const out = [];
+  titles.forEach(t => t.genres.forEach(g => {
+    const slug = slugify(g);
+    let group = out.find(x => x.slug === slug);
+    if (!group) out.push(group = { slug: slug, label: g, items: [] });
+    group.items.push(t);
+  }));
+  return out;
+}
 
 function playInfo(entry, withEpisode){
   const target = resumeTarget(entry);
@@ -376,29 +389,23 @@ function playInfo(entry, withEpisode){
   return { href: watchHref(entry, ep), label: label, target: target };
 }
 
-function slateCells(entry, extended){
-  const cells = [
-    extended ? ["Typ", typeLabel(entry)] : null,
-    ["År", entry.year],
-    entry.type === "series" ? ["Avsnitt", entry.episodes.length] : ["Längd", formatDuration(entry.duration)],
-    ["Genre", entry.genres.join(", ")],
-    extended ? ["Regi", [].concat(entry.director || []).join(", ")] : null
-  ];
-  return cells.filter(c => c && c[1]);
+function isNew(entry){ return entry.year && entry.year >= CURRENT_YEAR; }
+
+function badgeEl(text, variant){
+  return el("span", { class: "vault-badge" + (variant ? " vault-badge--" + variant : ""), text: text });
 }
 
-function fillSlate(dl, cells){
-  dl.replaceChildren(...cells.map(c => el("div", {}, [
-    el("dt", { text: c[0] }),
-    el("dd", { text: String(c[1]) })
-  ])));
+function titleBadges(entry, withRank){
+  const out = [];
+  if (isNew(entry)) out.push(badgeEl(entry.type === "series" ? "Ny serie" : "Ny film", "new"));
+  else out.push(badgeEl(typeLabel(entry)));
+  if (withRank && entry.top) out.push(badgeEl("Nr " + entry.top + " i valvet"));
+  return out;
 }
 
-function headingWithCount(tag, title, count){
-  return el(tag, { class: "vault-row-heading" }, [
-    el("span", { text: title }),
-    count != null ? el("span", { class: "vault-row-count", text: String(count).padStart(2, "0") }) : null
-  ]);
+function metaSpans(entry){
+  return [entry.year, runtimeLabel(entry)].concat(entry.genres)
+    .filter(Boolean).map(v => el("span", { text: String(v) }));
 }
 
 /* ---------- cards ---------- */
@@ -411,121 +418,142 @@ function bindOverlayClick(node, kind, key){
   });
 }
 
-function buildCard(entry){
-  const art = el("div", { class: "vault-card-art" }, [
-    el("img", { src: entry.poster || entry.backdrop || "", alt: "", loading: "lazy", decoding: "async" }),
-    el("span", { class: "vault-card-title", text: entry.title })
+function cardText(title, meta, attrs){
+  return el("div", { class: "vcard-text" }, [
+    el("p", Object.assign({ class: "vcard-title", text: title }, attrs && attrs.title)),
+    meta ? el("p", Object.assign({ class: "vcard-meta", text: meta }, attrs && attrs.meta)) : null
   ]);
-  if (entry.type === "series") art.append(el("span", { class: "vault-card-tag", text: "Serie" }));
+}
 
-  const card = el("a", {
-    class: "vault-card",
-    href: detailHref(entry),
-    "data-slug": entry.slug,
-    "aria-label": entry.title + " (" + typeLabel(entry).toLowerCase() + ")"
-  }, [art]);
+function buildCard(entry, shape){
+  shape = shape || "land";
+  const src = shape === "poster" ? entry.portrait || entry.poster : entry.poster || entry.backdrop;
+  const art = el("div", { class: "vcard-art" }, [
+    el("img", { src: src || "", alt: "", loading: "lazy", decoding: "async" }),
+    isNew(entry) ? badgeEl(entry.type === "series" ? "Ny serie" : "Ny film", "new") : null
+  ]);
+  const card = el("a", { class: "vcard vcard--" + shape, href: detailHref(entry), "data-slug": entry.slug }, [
+    art,
+    cardText(entry.title, [typeLabel(entry), entry.year].filter(Boolean).join(" · "))
+  ]);
   bindOverlayClick(card, "titel", entry.slug);
-  attachPreviewHover(card, entry);
   return card;
 }
 
 function buildContinueCard(entry, target){
   const ep = target.episode;
   const sub = ep
-    ? (target.upNext ? "Nästa: " : "") + episodeLabel(ep) + " · " + ep.title
+    ? (target.upNext ? "Nästa: " : "") + episodeLabel(ep) + (target.record ? " · " + remainingLabel(target.record) : " · " + ep.title)
     : remainingLabel(target.record);
 
   const link = el("a", {
-    class: "vault-card-art",
+    class: "vcard-art",
     href: watchHref(entry, ep),
     "aria-label": "Fortsätt titta på " + entry.title + (ep ? ", " + episodeLabel(ep) : "")
   }, [
     el("img", { src: (ep && ep.poster) || entry.poster || "", alt: "", loading: "lazy", decoding: "async" }),
-    el("span", { class: "vault-card-playicon", html: ICONS.play }),
+    el("span", { class: "vcard-play", html: ICONS.play }),
     progressBar(target.record ? progressRatio(target.record) : 0)
   ]);
-
-  const info = el("button", { type: "button", class: "vault-mini-btn", "aria-label": "Mer info om " + entry.title, title: "Mer info", html: ICONS.info });
-  info.addEventListener("click", () => openOverlay("titel", entry.slug));
-
-  const remove = el("button", { type: "button", class: "vault-mini-btn", "aria-label": "Ta bort " + entry.title + " från Fortsätt titta", title: "Ta bort från raden", html: ICONS.close });
+  const remove = el("button", { type: "button", class: "vcard-remove", "aria-label": "Ta bort " + entry.title + " från Fortsätt titta", title: "Ta bort från raden", html: ICONS.close });
   remove.addEventListener("click", () => {
     clearProgress(entry);
     renderView();
   });
+  const title = el("a", { class: "vcard-title", href: detailHref(entry), text: entry.title });
+  bindOverlayClick(title, "titel", entry.slug);
 
-  return el("div", { class: "vault-card vault-card--continue", "data-slug": entry.slug }, [
-    link,
-    el("div", { class: "vault-card-caption" }, [
-      el("div", { class: "vault-card-caption-text" }, [
-        el("span", { class: "vault-card-caption-title", text: entry.title }),
-        el("span", { class: "vault-card-caption-sub", text: sub })
-      ]),
-      info,
-      remove
-    ])
+  return el("div", { class: "vcard vcard--land vcard--continue", "data-slug": entry.slug }, [
+    el("div", { class: "vcard-media" }, [link, remove]),
+    el("div", { class: "vcard-text" }, [title, el("p", { class: "vcard-meta", text: sub })])
   ]);
 }
 
 function buildTopCard(entry, rank){
-  const card = el("a", {
-    class: "vault-top-card",
-    href: detailHref(entry),
-    "data-slug": entry.slug,
-    "aria-label": "Nummer " + rank + ": " + entry.title
-  }, [
-    el("span", { class: "vault-top-num", text: String(rank), "aria-hidden": "true" }),
-    el("div", { class: "vault-top-art" }, [
+  const card = el("a", { class: "vtop", href: detailHref(entry), "data-slug": entry.slug, "aria-label": "Nummer " + rank + ": " + entry.title }, [
+    el("span", { class: "vtop-num", text: String(rank), "aria-hidden": "true" }),
+    el("div", { class: "vcard-art" }, [
       el("img", { src: entry.portrait || entry.poster || "", alt: "", loading: "lazy", decoding: "async" }),
-      el("span", { class: "vault-card-title", text: entry.title })
+      el("span", { class: "vtop-title", text: entry.title })
     ])
   ]);
   bindOverlayClick(card, "titel", entry.slug);
-  attachPreviewHover(card, entry);
   return card;
 }
 
 function buildLiveCard(live){
-  const card = el("a", { class: "vault-live-card", href: liveHref(live), "data-live": live.id }, [
-    el("div", { class: "vault-live-thumb" }, [
+  const card = el("a", { class: "vcard vcard--land vcard--live", href: liveHref(live), "data-live": live.id }, [
+    el("div", { class: "vcard-art" }, [
       el("img", { src: liveThumbSrc(live), alt: "", loading: "lazy", decoding: "async" }),
-      el("span", { class: "vault-live-badge" }, [el("i"), document.createTextNode("Live")]),
-      live.duration ? el("span", { class: "vault-live-duration", text: formatClock(live.duration) }) : null,
-      el("span", { class: "vault-live-play", html: ICONS.play })
+      el("span", { class: "vault-badge vault-badge--live" }, [el("i"), document.createTextNode("Live")]),
+      live.duration ? el("span", { class: "vcard-duration", text: formatClock(live.duration) }) : null,
+      el("span", { class: "vcard-play vcard-play--live", html: ICONS.play })
     ]),
-    el("div", { class: "vault-live-body" }, [
-      el("p", { class: "vault-live-title", "data-live-title": live.id, text: liveTitle(live) }),
-      el("p", { class: "vault-live-meta", "data-live-meta": live.id, text: liveMetaLine(live) })
-    ])
+    cardText(liveTitle(live), liveMetaLine(live), {
+      title: { "data-live-title": live.id },
+      meta: { "data-live-meta": live.id }
+    })
   ]);
   bindOverlayClick(card, "live", live.id);
   return card;
 }
 
-function listButton(entry, extraClass){
-  const btn = el("button", { type: "button", class: "vault-round-btn" + (extraClass ? " " + extraClass : "") });
+function exploreTiles(){
+  const m = vault.manifest;
+  const used = new Set();
+  const pickArt = items => {
+    const hit = items.find(t => !used.has(t.backdrop || t.poster)) || items[0];
+    const src = hit ? hit.backdrop || hit.poster : "";
+    used.add(src);
+    return src;
+  };
+  const tiles = [];
+  const series = m.titles.filter(t => t.type === "series");
+  const movies = m.titles.filter(t => t.type !== "series");
+  if (series.length) tiles.push({ label: "Serier", sub: countLabel(series.length, "titel", "titlar"), image: pickArt(series), href: "/vault?visa=serier", view: "serier" });
+  if (movies.length) tiles.push({ label: "Filmer", sub: countLabel(movies.length, "titel", "titlar"), image: pickArt(movies), href: "/vault?visa=filmer", view: "filmer" });
+  filmGenres(m.titles)
+    .filter(g => g.items.length >= 2 && g.items.length < m.titles.length)
+    .forEach(g => tiles.push({ label: g.label, sub: countLabel(g.items.length, "titel", "titlar"), image: pickArt(g.items), href: "/vault?visa=genre&genre=" + g.slug, view: "genre", genre: g.slug }));
+  if (m.lives.length) tiles.push({ label: "Live", sub: countLabel(m.lives.length, "sändning", "sändningar"), image: "/vault-art/live-backdrop.jpg", href: "/vault?visa=live", view: "live", live: true });
+  return tiles;
+}
+
+function buildTile(t){
+  const tile = el("a", { class: "vtile" + (t.live ? " vtile--live" : ""), href: t.href, "data-view": t.view }, [
+    el("span", { class: "vtile-bg", style: "background-image:" + cssUrl(t.image) }),
+    el("span", { class: "vtile-label", text: t.label }),
+    el("span", { class: "vtile-sub", text: t.sub })
+  ]);
+  if (t.genre) tile.dataset.genre = t.genre;
+  bindNavLink(tile);
+  return tile;
+}
+
+function listButton(entry, variant){
+  const pill = variant === "pill";
+  const btn = el("button", { type: "button", class: pill ? "vault-btn vault-btn--glass" : "vault-btn vault-btn--glass vault-btn--icon" });
   const sync = () => {
     const on = inList(entry.slug);
-    btn.innerHTML = on ? ICONS.check : ICONS.plus;
+    btn.innerHTML = (on ? ICONS.check : ICONS.plus) + (pill ? "<span>Min lista</span>" : "");
+    btn.classList.toggle("is-on", on);
     btn.setAttribute("aria-pressed", String(on));
     btn.setAttribute("aria-label", on ? "Ta bort " + entry.title + " från Min lista" : "Lägg till " + entry.title + " i Min lista");
     btn.title = on ? "Ta bort från Min lista" : "Lägg till i Min lista";
   };
+  btn.dataset.listSlug = entry.slug;
+  btn._syncList = sync;
   btn.addEventListener("click", e => {
     e.preventDefault();
     e.stopPropagation();
     toggleList(entry.slug);
-    sync();
-    onListChanged();
+    // every other + button for the same title (hero, title page) follows along
+    document.querySelectorAll('[data-list-slug="' + CSS.escape(entry.slug) + '"]').forEach(b => b._syncList && b._syncList());
+    if (!vault.overlay) renderView();
+    else vault.rowsDirty = true;
   });
   sync();
   return btn;
-}
-
-function onListChanged(){
-  syncCounts();
-  if (!$("vaultPreview").hidden) vault.rowsDirty = true;
-  else renderView();
 }
 
 /* ---------- rows ---------- */
@@ -541,6 +569,9 @@ function buildHomeRows(manifest){
     .sort((a, b) => b.target.updatedAt - a.target.updatedAt);
   if (continuing.length) rows.push({ title: "Fortsätt titta", kind: "continue", items: continuing });
 
+  const tiles = exploreTiles();
+  if (tiles.length > 1) rows.push({ title: "Utforska", kind: "explore", items: tiles });
+
   const list = readList().map(slug => findEntryBySlug(manifest, slug)).filter(Boolean);
   if (list.length) rows.push({ title: "Min lista", items: list });
 
@@ -548,9 +579,9 @@ function buildHomeRows(manifest){
   if (top.length >= 3) rows.push({ title: "Topp " + top.length + " i valvet", kind: "top", items: top });
 
   const newest = titles.slice().sort((a, b) => (b.year || 0) - (a.year || 0));
-  if (newest.length) rows.push({ title: "Nytt i valvet", items: newest });
+  if (newest.length) rows.push({ title: "Nytt i valvet", kind: "poster", items: newest });
 
-  if (manifest.lives.length) rows.push({ title: "Senast från Live", kind: "live", items: manifest.lives.slice(0, 10) });
+  if (manifest.lives.length) rows.push({ title: "Senast från Live", kind: "live", items: manifest.lives.slice(0, 10), link: { text: "Live-arkivet", href: "/vault?visa=live", view: "live" } });
 
   const series = titles.filter(t => t.type === "series");
   const movies = titles.filter(t => t.type !== "series");
@@ -558,12 +589,9 @@ function buildHomeRows(manifest){
   if (movies.length >= 2) rows.push({ title: "Filmer", items: movies });
 
   // a genre row earns its place once it groups some, but not all, titles
-  const genres = [];
-  titles.forEach(t => t.genres.forEach(g => { if (!genres.includes(g)) genres.push(g); }));
-  genres.forEach(g => {
-    const items = titles.filter(t => t.genres.includes(g));
-    if (items.length >= 2 && items.length < titles.length) rows.push({ title: g, items: items });
-  });
+  filmGenres(titles)
+    .filter(g => g.items.length >= 2 && g.items.length < titles.length)
+    .forEach(g => rows.push({ title: g.label, items: g.items, link: { text: "Visa alla", href: "/vault?visa=genre&genre=" + g.slug, view: "genre", genre: g.slug } }));
 
   return rows;
 }
@@ -574,6 +602,8 @@ function buildRow(row){
     if (row.kind === "continue") track.append(buildContinueCard(item.entry, item.target));
     else if (row.kind === "top") track.append(buildTopCard(item, i + 1));
     else if (row.kind === "live") track.append(buildLiveCard(item));
+    else if (row.kind === "explore") track.append(buildTile(item));
+    else if (row.kind === "poster") track.append(buildCard(item, "poster"));
     else track.append(buildCard(item));
   });
 
@@ -582,20 +612,20 @@ function buildRow(row){
   const page = dir => track.scrollBy({ left: dir * track.clientWidth * 0.9, behavior: "smooth" });
   prev.addEventListener("click", () => page(-1));
   next.addEventListener("click", () => page(1));
-
   const sync = () => {
     const max = track.scrollWidth - track.clientWidth - 2;
     prev.hidden = track.scrollLeft <= 2;
     next.hidden = track.scrollLeft >= max;
   };
-  track.addEventListener("scroll", () => { hidePreview(); sync(); }, { passive: true });
+  track.addEventListener("scroll", sync, { passive: true });
   vault.rowSyncs.push(sync);
 
-  const heading = headingWithCount("h2", row.title, row.kind === "top" ? null : row.items.length);
-  if (row.kind === "live"){
-    const more = el("a", { class: "vault-row-link", href: "/vault?visa=live", "data-view": "live", text: "Hela live-arkivet" });
-    bindNavLink(more);
-    heading.append(more);
+  const heading = el("h2", { class: "vault-row-heading", text: row.title });
+  if (row.link){
+    const link = el("a", { class: "vault-row-link", href: row.link.href, "data-view": row.link.view, text: row.link.text });
+    if (row.link.genre) link.dataset.genre = row.link.genre;
+    bindNavLink(link);
+    heading.append(link);
   }
 
   return el("section", { class: "vault-row" + (row.kind ? " vault-row--" + row.kind : "") }, [
@@ -606,7 +636,7 @@ function buildRow(row){
 
 function renderRows(){
   const wrap = $("vaultRows");
-  wrap.innerHTML = "";
+  wrap.replaceChildren();
   vault.rowSyncs = [];
   buildHomeRows(vault.manifest).forEach(row => wrap.append(buildRow(row)));
   requestAnimationFrame(() => vault.rowSyncs.forEach(fn => fn()));
@@ -614,18 +644,23 @@ function renderRows(){
 
 function renderResults(heading, groups, emptyText){
   $("vaultResultsHeading").textContent = heading;
+  $("vaultResultsHeading").hidden = !heading;
   const body = $("vaultResultsBody");
   body.replaceChildren();
   const filled = groups.filter(g => g.items.length);
   filled.forEach(g => {
-    if (groups.length > 1) body.append(headingWithCount("h2", g.label, g.items.length));
-    const grid = el("div", { class: g.kind === "live" ? "vault-live-grid" : "vault-grid" });
-    g.items.forEach(item => grid.append(g.kind === "live" ? buildLiveCard(item) : buildCard(item)));
+    if (g.label) body.append(el("h2", { class: "vault-row-heading", text: g.label }));
+    const grid = el("div", { class: "vault-grid vault-grid--" + (g.kind === "tile" ? "tile" : g.kind === "poster" ? "poster" : "land") });
+    g.items.forEach(item => grid.append(
+      g.kind === "live" ? buildLiveCard(item) :
+      g.kind === "tile" ? buildTile(item) :
+      buildCard(item, g.kind === "poster" ? "poster" : "land")
+    ));
     body.append(grid);
   });
   const empty = $("vaultResultsEmpty");
   empty.textContent = emptyText || "";
-  empty.hidden = filled.length > 0;
+  empty.hidden = filled.length > 0 || !emptyText;
 }
 
 /* ---------- live library ---------- */
@@ -653,11 +688,8 @@ function renderLive(){
     });
   }
 
-  const label = vault.kategori ? cats.find(c => c.slug === vault.kategori).label : "Alla sändningar";
-  $("vaultLiveHeading").firstElementChild.textContent = label;
-  $("vaultLiveCount").textContent = String(shown.length).padStart(2, "0");
-  const grid = $("vaultLiveGrid");
-  grid.replaceChildren(...shown.map(buildLiveCard));
+  $("vaultLiveHeading").textContent = vault.kategori ? cats.find(c => c.slug === vault.kategori).label : "Alla sändningar";
+  $("vaultLiveGrid").replaceChildren(...shown.map(buildLiveCard));
   $("vaultLiveEmpty").hidden = shown.length > 0;
 
   const latest = $("vaultLiveLatest");
@@ -665,96 +697,254 @@ function renderLive(){
   if (lives.length) latest.href = liveHref(lives[0]);
 }
 
-/* ---------- hero ---------- */
+/* ---------- hero carousel + ambient colour ---------- */
 
-function pickHero(pool){
-  const featured = pool.filter(t => t.featured);
-  const candidates = featured.length ? featured : pool.slice(0, 1);
-  return candidates[Math.floor(Math.random() * candidates.length)] || null;
+const ambientCache = {};
+
+/* Tints the page with the dominant colour of whatever is on screen, the
+   way TV apps glow around their artwork. Same-origin images only. */
+function setAmbient(src){
+  if (!src) return;
+  const apply = rgb => document.documentElement.style.setProperty("--ambient", rgb.join(" "));
+  if (ambientCache[src]) return apply(ambientCache[src]);
+  const img = new Image();
+  img.onload = () => {
+    try{
+      const c = document.createElement("canvas");
+      c.width = 24; c.height = 14;
+      const ctx = c.getContext("2d", { willReadFrequently: true });
+      ctx.drawImage(img, 0, 0, 24, 14);
+      const d = ctx.getImageData(0, 0, 24, 14).data;
+      let r = 0, g = 0, b = 0, wsum = 0;
+      for (let i = 0; i < d.length; i += 4){
+        const max = Math.max(d[i], d[i + 1], d[i + 2]), min = Math.min(d[i], d[i + 1], d[i + 2]);
+        const w = 1 + (max - min) / 32;  // favour colourful pixels over grey
+        r += d[i] * w; g += d[i + 1] * w; b += d[i + 2] * w; wsum += w;
+      }
+      const rgb = [r, g, b].map(v => v / wsum);
+      const peak = Math.max(...rgb) || 1;
+      ambientCache[src] = rgb.map(v => Math.round(v / peak * 150));  // normalise brightness
+      apply(ambientCache[src]);
+    } catch(e){}
+  };
+  img.src = src;
 }
 
-function renderHero(pool){
-  if (vault.heroView !== vault.view || !vault.heroEntry){
-    vault.heroView = vault.view;
-    vault.heroEntry = pickHero(pool);
-    const entry = vault.heroEntry;
-    if (!entry){ stopHeroTrailer(); return false; }
-
-    const status = { serier: "Serier", filmer: "Filmer" }[vault.view] || "Utvalt";
-    $("vaultHeroStatus").lastElementChild.textContent = status;
-    $("vaultHeroKicker").textContent = typeLabel(entry);
-    $("vaultHeroTitle").textContent = entry.title;
-    fillSlate($("vaultHeroSlate"), slateCells(entry, false));
-    $("vaultHeroDesc").textContent = entry.synopsis || "";
-    $("vaultHeroBg").style.backgroundImage = cssUrl(entry.backdrop || entry.poster);
-    startHeroTrailer(entry);
+function heroSlidesFor(view){
+  const titles = vault.manifest.titles;
+  if (view === "serier" || view === "filmer"){
+    const series = view === "serier";
+    return titles.filter(t => (t.type === "series") === series).slice(0, 5).map(entry => ({ kind: "title", entry: entry }));
   }
-  if (!vault.heroEntry) return false;
-  const info = playInfo(vault.heroEntry, false);
-  $("vaultHeroPlay").href = info.href;
-  $("vaultHeroPlayLabel").textContent = info.label;
-  return true;
+  const picked = titles.filter(t => t.featured)
+    .concat(titles.filter(t => !t.featured && t.top).sort((a, b) => a.top - b.top));
+  const slides = picked.slice(0, 5).map(entry => ({ kind: "title", entry: entry }));
+  if (!slides.length && titles.length) slides.push({ kind: "title", entry: titles[0] });
+  if (vault.manifest.lives.length) slides.push({ kind: "live" });
+  return slides;
 }
 
-function startHeroTrailer(entry){
-  const video = $("vaultHeroTrailer");
-  stopHeroTrailer();
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const saveData = navigator.connection && navigator.connection.saveData;
-  if (!entry.trailer || reduceMotion || saveData) return;
-  vault.trailerTimer = setTimeout(() => {
-    video.src = entry.trailer;
-    video.muted = true;
-    video.play().catch(() => {});
-  }, 2500);
+function buildSlide(slide, i, total){
+  const node = el("article", { class: "vault-slide", "aria-roledescription": "bild", "aria-label": (i + 1) + " av " + total });
+  const content = el("div", { class: "vault-slide-content" });
+
+  if (slide.kind === "live"){
+    slide.image = "/vault-art/live-backdrop.jpg";
+    const latest = vault.manifest.lives[0];
+    const play = el("a", { class: "vault-btn vault-btn--primary", href: liveHref(latest) }, []);
+    play.innerHTML = ICONS.play + "<span>Senaste sändningen</span>";
+    bindOverlayClick(play, "live", latest.id);
+    const more = el("a", { class: "vault-btn vault-btn--glass", href: "/vault?visa=live", "data-view": "live", text: "Live-arkivet" });
+    bindNavLink(more);
+    content.append(
+      el("div", { class: "vault-badges" }, [
+        el("span", { class: "vault-badge vault-badge--live" }, [el("i"), document.createTextNode("Live")]),
+        badgeEl(countLabel(vault.manifest.lives.length, "sändning", "sändningar"))
+      ]),
+      el("h2", { class: "vault-slide-title", text: "Live-arkivet" }),
+      el("p", { class: "vault-hero-desc", text: "Flera kameror, klippt i realtid. Evenemang, sport och annat vi har sänt live." }),
+      el("div", { class: "vault-actions" }, [play, more])
+    );
+  } else {
+    const entry = slide.entry;
+    slide.image = entry.backdrop || entry.poster;
+    const info = playInfo(entry, false);
+    const play = el("a", { class: "vault-btn vault-btn--primary", href: info.href });
+    play.innerHTML = ICONS.play + "<span></span>";
+    play.lastChild.textContent = info.label;
+    slide.play = play;
+    const details = el("a", { class: "vault-btn vault-btn--glass vault-btn--icon", href: detailHref(entry), "aria-label": "Mer om " + entry.title, title: "Mer info", html: ICONS.info });
+    bindOverlayClick(details, "titel", entry.slug);
+    content.append(
+      el("div", { class: "vault-badges" }, titleBadges(entry, true)),
+      el("h2", { class: "vault-slide-title", text: entry.title }),
+      el("p", { class: "vault-meta" }, metaSpans(entry)),
+      entry.synopsis ? el("p", { class: "vault-hero-desc", text: entry.synopsis }) : null,
+      el("div", { class: "vault-actions" }, [play, listButton(entry, "pill"), details])
+    );
+    if (entry.trailer) slide.trailer = entry.trailer;
+  }
+
+  const bg = el("div", { class: "vault-slide-bg", style: "background-image:" + cssUrl(slide.image) });
+  node.append(bg);
+  if (slide.trailer){
+    slide.video = el("video", { class: "vault-slide-trailer", muted: true, playsinline: true, preload: "none", "aria-hidden": "true" });
+    slide.video.muted = true;
+    slide.video.addEventListener("playing", () => { node.classList.add("is-trailer"); $("vaultHeroMute").hidden = false; holdHero("trailer", true); });
+    slide.video.addEventListener("ended", () => { node.classList.remove("is-trailer"); $("vaultHeroMute").hidden = true; holdHero("trailer", false); });
+    node.append(slide.video);
+  }
+  node.append(content);
+  return node;
 }
 
-function stopHeroTrailer(){
-  const video = $("vaultHeroTrailer");
-  clearTimeout(vault.trailerTimer);
-  $("vaultHero").classList.remove("is-trailer");
+function renderHero(view){
+  if (hero.view === view && hero.slides.length){
+    refreshHeroLabels();
+    return true;
+  }
+  stopHero();
+  hero.view = view;
+  hero.slides = heroSlidesFor(view);
+  const total = hero.slides.length;
+  hero.nodes = hero.slides.map((s, i) => buildSlide(s, i, total));
+  $("vaultHeroSlides").replaceChildren(...hero.nodes);
+
+  const dots = $("vaultHeroDots");
+  dots.replaceChildren(...hero.slides.map((s, i) => {
+    const label = s.kind === "live" ? "Live-arkivet" : s.entry.title;
+    const dot = el("button", { type: "button", class: "vault-dot", "aria-label": "Visa " + label }, [el("span")]);
+    dot.addEventListener("click", () => goToSlide(i));
+    return dot;
+  }));
+  const multi = total > 1;
+  dots.hidden = !multi;
+  $("vaultHeroPrev").hidden = !multi;
+  $("vaultHeroNext").hidden = !multi;
+  if (total) goToSlide(0);
+  return total > 0;
+}
+
+function refreshHeroLabels(){
+  hero.slides.forEach(s => {
+    if (s.play && s.entry){
+      const info = playInfo(s.entry, false);
+      s.play.href = info.href;
+      s.play.lastChild.textContent = info.label;
+    }
+  });
+}
+
+function goToSlide(i){
+  const total = hero.slides.length;
+  if (!total) return;
+  const prevSlide = hero.slides[hero.index];
+  if (prevSlide && prevSlide.video){ prevSlide.video.pause(); hero.nodes[hero.index].classList.remove("is-trailer"); }
   $("vaultHeroMute").hidden = true;
-  if (video.getAttribute("src")){
-    video.pause();
-    video.removeAttribute("src");
-    video.load();
+  holdHero("trailer", false);
+
+  hero.index = (i + total) % total;
+  hero.nodes.forEach((node, n) => {
+    const active = n === hero.index;
+    node.classList.toggle("is-active", active);
+    node.inert = !active;
+    node.setAttribute("aria-hidden", String(!active));
+  });
+  Array.from($("vaultHeroDots").children).forEach((dot, n) => {
+    dot.classList.toggle("is-active", n === hero.index);
+    if (n === hero.index) dot.setAttribute("aria-current", "true"); else dot.removeAttribute("aria-current");
+  });
+  const slide = hero.slides[hero.index];
+  setAmbient(slide.image);
+
+  clearTimeout(hero.trailerTimer);
+  if (slide.video && !reducedMotion.matches && !(navigator.connection && navigator.connection.saveData)){
+    hero.trailerTimer = setTimeout(() => {
+      if (!slide.video.getAttribute("src")) slide.video.src = slide.trailer;
+      slide.video.currentTime = 0;
+      slide.video.play().catch(() => {});
+    }, 2500);
+  }
+  scheduleHero(HERO_INTERVAL);
+}
+
+/* Auto-advance pauses while anything "holds" it: pointer over the hero,
+   keyboard focus inside it, an open overlay, a hidden tab, a playing trailer. */
+function scheduleHero(ms){
+  clearTimeout(hero.timer);
+  hero.remaining = ms;
+  const heroEl = $("vaultHero");
+  const held = Object.keys(hero.holds).some(k => hero.holds[k]);
+  const dotFill = $("vaultHeroDots").querySelector(".is-active span");
+  if (dotFill){
+    // restart the progress line for this slide
+    dotFill.style.animation = "none";
+    void dotFill.offsetWidth;
+    dotFill.style.animation = "";
+    dotFill.style.animationDuration = HERO_INTERVAL + "ms";
+  }
+  heroEl.classList.toggle("is-held", held || reducedMotion.matches);
+  if (held || reducedMotion.matches || hero.slides.length < 2) return;
+  hero.deadline = Date.now() + ms;
+  hero.timer = setTimeout(() => goToSlide(hero.index + 1), ms);
+}
+
+function holdHero(reason, on){
+  const wasHeld = Object.keys(hero.holds).some(k => hero.holds[k]);
+  hero.holds[reason] = on;
+  const isHeld = Object.keys(hero.holds).some(k => hero.holds[k]);
+  const heroEl = $("vaultHero");
+  heroEl.classList.toggle("is-held", isHeld || reducedMotion.matches);
+  if (isHeld && !wasHeld){
+    clearTimeout(hero.timer);
+    hero.remaining = Math.max(0, hero.deadline - Date.now());
+  } else if (!isHeld && wasHeld && hero.slides.length > 1 && !reducedMotion.matches){
+    hero.deadline = Date.now() + hero.remaining;
+    hero.timer = setTimeout(() => goToSlide(hero.index + 1), hero.remaining);
   }
 }
 
-function setHeroTrailerPaused(paused){
-  const video = $("vaultHeroTrailer");
-  if (!$("vaultHero").classList.contains("is-trailer")) return;
-  if (paused) video.pause();
-  else if (!vault.overlay && !document.hidden) video.play().catch(() => {});
+function stopHero(){
+  clearTimeout(hero.timer);
+  clearTimeout(hero.trailerTimer);
+  hero.slides.forEach(s => { if (s.video) s.video.pause(); });
+  hero.view = null;
+  hero.slides = [];
+  hero.nodes = [];
 }
 
-function initHeroTrailer(){
-  const hero = $("vaultHero");
-  const video = $("vaultHeroTrailer");
-  const mute = $("vaultHeroMute");
-
-  video.addEventListener("playing", () => {
-    hero.classList.add("is-trailer");
-    mute.hidden = false;
-  });
-  video.addEventListener("ended", () => {
-    hero.classList.remove("is-trailer");
-    mute.hidden = true;
-  });
-  mute.addEventListener("click", () => {
-    video.muted = !video.muted;
-    mute.classList.toggle("is-unmuted", !video.muted);
-    mute.setAttribute("aria-label", video.muted ? "Slå på ljud" : "Stäng av ljud");
-  });
-  document.addEventListener("visibilitychange", () => setHeroTrailerPaused(document.hidden));
+function initHero(){
+  const heroEl = $("vaultHero");
+  $("vaultHeroPrev").addEventListener("click", () => goToSlide(hero.index - 1));
+  $("vaultHeroNext").addEventListener("click", () => goToSlide(hero.index + 1));
+  heroEl.addEventListener("pointerenter", e => { if (e.pointerType === "mouse") holdHero("pointer", true); });
+  heroEl.addEventListener("pointerleave", e => { if (e.pointerType === "mouse") holdHero("pointer", false); });
+  heroEl.addEventListener("focusin", () => holdHero("focus", true));
+  heroEl.addEventListener("focusout", e => { if (!heroEl.contains(e.relatedTarget)) holdHero("focus", false); });
+  document.addEventListener("visibilitychange", () => holdHero("hidden", document.hidden));
   if ("IntersectionObserver" in window){
-    new IntersectionObserver(entries => {
-      setHeroTrailerPaused(!entries[0].isIntersecting);
-    }, { threshold: 0.4 }).observe(hero);
+    new IntersectionObserver(entries => holdHero("offscreen", !entries[0].isIntersecting), { threshold: 0.35 }).observe(heroEl);
   }
-  $("vaultHeroInfo").addEventListener("click", () => {
-    if (vault.heroEntry) openOverlay("titel", vault.heroEntry.slug);
+
+  // swipe between slides on touch screens
+  let startX = null, startY = 0;
+  heroEl.addEventListener("pointerdown", e => { if (e.pointerType !== "mouse"){ startX = e.clientX; startY = e.clientY; } });
+  heroEl.addEventListener("pointerup", e => {
+    if (startX == null) return;
+    const dx = e.clientX - startX, dy = e.clientY - startY;
+    startX = null;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) goToSlide(hero.index + (dx < 0 ? 1 : -1));
   });
+
+  const mute = $("vaultHeroMute");
+  mute.addEventListener("click", () => {
+    const slide = hero.slides[hero.index];
+    if (!slide || !slide.video) return;
+    slide.video.muted = !slide.video.muted;
+    mute.classList.toggle("is-unmuted", !slide.video.muted);
+    mute.setAttribute("aria-label", slide.video.muted ? "Slå på ljud" : "Stäng av ljud");
+  });
+
   $("vaultLiveLatest").addEventListener("click", e => {
     if (!isPlainClick(e) || !vault.manifest.lives.length) return;
     e.preventDefault();
@@ -762,7 +952,7 @@ function initHeroTrailer(){
   });
 }
 
-/* ---------- views ---------- */
+/* ---------- search ---------- */
 
 function normalizeText(s){
   return String(s == null ? "" : s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
@@ -795,178 +985,20 @@ function searchLives(lives, query){
   ].join(" "));
 }
 
-function syncNav(){
-  const section = vault.view === "live" ? "live" : "film";
-  document.querySelectorAll(".vault-side-nav a[data-view]").forEach(a => {
-    const active = !vault.query && a.dataset.view === vault.view &&
-      (a.dataset.kategori || "") === (vault.view === "live" ? vault.kategori : "");
-    a.classList.toggle("active", active);
-    if (active) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
-  });
-  document.querySelectorAll(".vault-seg a").forEach(a => {
-    a.classList.toggle("active", !vault.query && a.dataset.section === section);
-  });
-  document.body.classList.toggle("vault-section-live", section === "live" && !vault.query);
-}
-
-function syncCounts(){
-  const m = vault.manifest;
-  const set = (id, n) => { $(id).textContent = n ? String(n).padStart(2, "0") : ""; };
-  set("vaultCountFilm", m.titles.length);
-  set("vaultCountLive", m.lives.length);
-  set("vaultCountList", readList().filter(slug => findEntryBySlug(m, slug)).length);
-}
-
-function renderSideCategories(){
-  const wrap = $("vaultLiveCats");
-  wrap.replaceChildren();
-  const cats = liveCategories(vault.manifest.lives);
-  if (cats.length < 2) return;
-  cats.forEach(c => {
-    const a = el("a", { href: "/vault?visa=live&kategori=" + c.slug, class: "vault-side-sub", "data-view": "live", "data-kategori": c.slug, text: c.label });
-    bindNavLink(a);
-    wrap.append(a);
-  });
-}
-
-function renderView(){
-  const manifest = vault.manifest;
-  if (!manifest) return;
-  hidePreview();
-  vault.rowsDirty = false;
-  syncNav();
-  syncCounts();
-
-  const show = parts => {
-    $("vaultHero").hidden = !parts.hero;
-    $("vaultRows").hidden = !parts.rows;
-    $("vaultResults").hidden = !parts.results;
-    $("vaultLive").hidden = !parts.live;
-    if (!parts.hero){ stopHeroTrailer(); vault.heroView = null; }
-    document.body.classList.toggle("vault-has-hero", !!(parts.hero || parts.live));
-  };
-
-  if (vault.query){
-    show({ results: true });
-    renderResults("Resultat för ”" + vault.query + "”", [
-      { label: "Film", kind: "film", items: searchTitles(manifest.titles, vault.query) },
-      { label: "Live", kind: "live", items: searchLives(manifest.lives, vault.query) }
-    ], "Inga träffar på ”" + vault.query + "”. Prova en titel, en genre eller ett årtal.");
-    document.title = "Sök | A+ Vault";
-  } else if (vault.view === "live"){
-    show({ live: true });
-    renderLive();
-    document.title = "Live | A+ Vault";
-  } else if (vault.view === "min-lista"){
-    show({ results: true });
-    const items = readList().map(slug => findEntryBySlug(manifest, slug)).filter(Boolean);
-    renderResults("Min lista", [{ kind: "film", items: items }], "Du har inte sparat något än. Tryck på + på en titel så hamnar den här.");
-    document.title = "Min lista | A+ Vault";
-  } else {
-    const type = vault.view === "serier" ? "series" : vault.view === "filmer" ? "movie" : null;
-    const pool = type ? manifest.titles.filter(t => (t.type === "series") === (type === "series")) : manifest.titles;
-    const heroShown = renderHero(pool);
-    if (type){
-      show({ hero: heroShown, results: true });
-      renderResults(VAULT_VIEWS[vault.view], [{ kind: "film", items: pool }], type === "series" ? "Inga serier i valvet än." : "Inga filmer i valvet än.");
-      document.title = VAULT_VIEWS[vault.view] + " | A+ Vault";
-    } else {
-      show({ hero: heroShown, rows: true });
-      renderRows();
-      document.title = "A+ Vault | A+ Studios";
-    }
-  }
-}
-
-/* ---------- routing: /vault?visa=…&kategori=…&sok=…&titel=…|live=… ---------- */
-
-function currentParams(){
-  const p = new URLSearchParams();
-  if (vault.view !== "hem") p.set("visa", vault.view);
-  if (vault.view === "live" && vault.kategori) p.set("kategori", vault.kategori);
-  if (vault.query) p.set("sok", vault.query);
-  if (vault.overlay) p.set(vault.overlay.kind, vault.overlay.key);
-  return p;
-}
-
-function urlForState(){
-  const qs = currentParams().toString();
-  return location.pathname + (qs ? "?" + qs : "");
-}
-
-function applyRoute(){
-  const p = new URLSearchParams(location.search);
-  const view = VAULT_VIEWS[p.get("visa")] ? p.get("visa") : "hem";
-  const kategori = view === "live" ? p.get("kategori") || "" : "";
-  const query = (p.get("sok") || "").trim();
-  if (!vault.routed || view !== vault.view || kategori !== vault.kategori || query !== vault.query){
-    vault.routed = true;
-    vault.view = view;
-    vault.kategori = kategori;
-    vault.query = query;
-    syncSearchInputs();
-    renderView();
-  }
-  const kind = p.get("titel") ? "titel" : p.get("live") ? "live" : null;
-  if (kind) openOverlay(kind, p.get(kind), { fromRoute: true });
-  else if (vault.overlay) hideOverlay();
-}
-
-function bindNavLink(a, opts){
-  a.addEventListener("click", e => {
-    if (!isPlainClick(e)) return;
-    e.preventDefault();
-    vault.view = a.dataset.section ? (a.dataset.section === "live" ? "live" : "hem") : a.dataset.view;
-    vault.kategori = a.dataset.kategori || "";
-    vault.query = "";
-    syncSearchInputs();
-    history.pushState(null, "", urlForState());
-    renderView();
-    setDrawer(false);
-    if (!(opts && opts.keepScroll)) window.scrollTo(0, 0);
-  });
-}
-
-function initNav(){
-  document.querySelectorAll(".vault-side-nav a[data-view], .vault-wordmark, .vault-seg a").forEach(a => bindNavLink(a));
-
-  const topbar = $("vaultTopbar");
-  const onScroll = () => topbar.classList.toggle("is-scrolled", window.scrollY > 10);
-  window.addEventListener("scroll", () => { onScroll(); hidePreview(); }, { passive: true });
-  onScroll();
-
-  $("vaultMenuBtn").addEventListener("click", () => setDrawer(true));
-  document.querySelectorAll("[data-side-close]").forEach(n => n.addEventListener("click", () => setDrawer(false)));
-  sidebarDocked.addEventListener("change", () => setDrawer(false));
-}
-
-function setDrawer(open){
-  const side = $("vaultSide");
-  const wasOpen = side.classList.contains("is-open");
-  if (open === wasOpen) return;
-  side.classList.toggle("is-open", open);
-  $("vaultSideScrim").hidden = !open;
-  $("vaultMenuBtn").setAttribute("aria-expanded", String(open));
-  document.documentElement.classList.toggle("vault-scroll-lock", open || !!vault.overlay);
-  if (open) side.querySelector(".vault-side-nav a").focus({ preventScroll: true });
-  else if (!sidebarDocked.matches) $("vaultMenuBtn").focus({ preventScroll: true });
-}
-
-/* ---------- search ---------- */
-
 function searchInputs(){ return Array.from(document.querySelectorAll(".vault-search-input")); }
 
 function syncSearchInputs(){
   searchInputs().forEach(input => { if (document.activeElement !== input) input.value = vault.query; });
-  if (vault.query && !sidebarDocked.matches) setTopSearch(true, false);
 }
 
-function setTopSearch(open, focus){
-  const row = $("vaultTopSearch");
-  row.hidden = !open;
-  $("vaultTopSearchBtn").setAttribute("aria-expanded", String(open));
-  $("vaultTopbar").classList.toggle("has-search", open);
-  if (open && focus) row.querySelector("input").focus();
+function setQuery(raw){
+  const query = raw.trim();
+  if (query === vault.query) return;
+  const starting = !vault.query && query;
+  vault.query = query;
+  history.replaceState(history.state, "", urlForState());
+  renderView();
+  if (starting && vault.view !== "sok") window.scrollTo(0, 0);
 }
 
 function initSearch(){
@@ -982,138 +1014,178 @@ function initSearch(){
         input.value = "";
         setQuery("");
         input.blur();
-        if (!sidebarDocked.matches) setTopSearch(false);
       } else if (e.key === "Enter"){
-        input.blur();  // close the on-screen keyboard so results are visible
+        input.blur();  // drop the on-screen keyboard so the results show
       }
     });
   });
-
-  $("vaultTopSearchBtn").addEventListener("click", () => {
-    const open = $("vaultTopSearch").hidden;
-    setTopSearch(open, open);
-    if (!open && vault.query){
-      searchInputs().forEach(i => { i.value = ""; });
-      setQuery("");
-    }
-  });
-
   document.addEventListener("keydown", e => {
     const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName);
-    if (e.key === "/" && !typing && !vault.overlay){
-      e.preventDefault();
-      if (sidebarDocked.matches) $("vaultSearch").focus();
-      else setTopSearch(true, true);
-    } else if (e.key === "Escape" && $("vaultSide").classList.contains("is-open")){
-      setDrawer(false);
+    if (e.key !== "/" || typing || vault.overlay) return;
+    e.preventDefault();
+    if (sidebarDocked.matches) $("vaultSearch").focus();
+    else navigateTo({ view: "sok" });
+  });
+}
+
+/* ---------- views ---------- */
+
+function syncNav(){
+  document.querySelectorAll(".vault-nav a[data-view], .vault-tabbar a[data-view], .vault-mchips a[data-view]").forEach(a => {
+    const searching = !!vault.query && a.dataset.view !== "sok";
+    let active = !searching && a.dataset.view === vault.view &&
+      (a.dataset.kategori || "") === (vault.view === "live" ? vault.kategori : "");
+    if (a.closest(".vault-tabbar") && a.dataset.view === "hem") active = !vault.query && ["hem", "serier", "filmer", "genre"].includes(vault.view);
+    if (a.closest(".vault-tabbar") && a.dataset.view === "sok") active = vault.view === "sok" || !!vault.query;
+    a.classList.toggle("active", active);
+    if (active) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
+  });
+}
+
+function renderSideCategories(){
+  const wrap = $("vaultLiveCats");
+  wrap.replaceChildren();
+  const cats = liveCategories(vault.manifest.lives);
+  if (cats.length < 2) return;
+  cats.forEach(c => {
+    const a = el("a", { href: "/vault?visa=live&kategori=" + c.slug, class: "vault-nav-sub", "data-view": "live", "data-kategori": c.slug, text: c.label });
+    bindNavLink(a);
+    wrap.append(a);
+  });
+}
+
+function renderView(){
+  const manifest = vault.manifest;
+  if (!manifest) return;
+  vault.rowsDirty = false;
+  syncNav();
+
+  const parts = {};
+  if (vault.view === "sok" || vault.query){
+    parts.search = vault.view === "sok";
+    parts.results = true;
+    if (vault.query){
+      renderResults("Resultat för ”" + vault.query + "”", [
+        { label: "Film", kind: "land", items: searchTitles(manifest.titles, vault.query) },
+        { label: "Live", kind: "live", items: searchLives(manifest.lives, vault.query) }
+      ], "Inga träffar på ”" + vault.query + "”. Prova en titel, en genre eller ett årtal.");
+    } else {
+      renderResults("", [{ label: "Utforska", kind: "tile", items: exploreTiles() }], "");
     }
-  });
-}
-
-function setQuery(raw){
-  const query = raw.trim();
-  if (query === vault.query) return;
-  const starting = !vault.query && query;
-  vault.query = query;
-  history.replaceState(history.state, "", urlForState());
-  renderView();
-  if (starting) window.scrollTo(0, 0);
-}
-
-/* ---------- hover preview (desktop) ---------- */
-
-function attachPreviewHover(card, entry){
-  card.addEventListener("mouseenter", () => {
-    if (!canHoverPreview.matches || window.innerWidth < 900) return;
-    clearTimeout(vault.previewTimer);
-    vault.previewTimer = setTimeout(() => showPreview(card, entry), 450);
-  });
-  card.addEventListener("mouseleave", () => clearTimeout(vault.previewTimer));
-}
-
-function showPreview(card, entry){
-  const pv = $("vaultPreview");
-  const anchor = card.querySelector(".vault-top-art") || card;
-  const r = anchor.getBoundingClientRect();
-  if (!r.width) return;
-
-  const vw = document.documentElement.clientWidth;
-  const minLeft = sidebarDocked.matches ? $("vaultSide").getBoundingClientRect().right + 12 : 12;
-  const width = Math.min(Math.max(r.width * 1.45, 300), 420);
-  const left = Math.min(Math.max(r.left + r.width / 2 - width / 2, minLeft), vw - width - 12);
-  const artHeight = width * 9 / 16;
-  const top = r.top + r.height / 2 - artHeight / 2;
-  const info = playInfo(entry, true);
-  const target = info.target;
-
-  pv.innerHTML = "";
-  const art = el("a", { class: "vault-preview-art", href: detailHref(entry), "aria-label": "Mer info om " + entry.title }, [
-    el("img", { src: entry.poster || entry.backdrop || "", alt: "" }),
-    el("span", { class: "vault-card-title", text: entry.title })
-  ]);
-  if (target.record) art.append(progressBar(progressRatio(target.record)));
-  bindOverlayClick(art, "titel", entry.slug);
-
-  const play = el("a", { class: "vault-round-btn vault-round-btn--solid", href: info.href, "aria-label": info.label + ": " + entry.title, title: info.label, html: ICONS.play });
-  const more = el("button", { type: "button", class: "vault-round-btn vault-round-btn--push", "aria-label": "Mer info om " + entry.title, title: "Mer info", html: ICONS.down });
-  more.addEventListener("click", () => openOverlay("titel", entry.slug));
-
-  const progressText = target.record
-    ? (target.episode ? episodeLabel(target.episode) + " · " : "") + remainingLabel(target.record)
-    : target.upNext ? "Nästa: " + episodeLabel(target.episode) : "";
-
-  pv.append(art, el("div", { class: "vault-preview-body" }, [
-    el("div", { class: "vault-preview-actions" }, [play, listButton(entry), more]),
-    el("p", { class: "vault-preview-meta" }, [
-      el("span", { class: "vault-preview-type", text: typeLabel(entry) }),
-      document.createTextNode(metaLine(entry))
-    ]),
-    progressText ? el("p", { class: "vault-preview-progress", text: progressText }) : null,
-    entry.genres.length ? el("p", { class: "vault-preview-genres", text: entry.genres.join(" / ") }) : null
-  ]));
-
-  pv.style.left = (left + window.scrollX) + "px";
-  pv.style.top = (top + window.scrollY) + "px";
-  pv.style.width = width + "px";
-  pv.style.transformOrigin = (r.left + r.width / 2 - left) + "px " + (artHeight / 2) + "px";
-  pv.style.setProperty("--from-scale", (r.width / width).toFixed(3));
-  pv.hidden = false;
-  requestAnimationFrame(() => pv.classList.add("is-open"));
-}
-
-function hidePreview(){
-  const pv = $("vaultPreview");
-  clearTimeout(vault.previewTimer);
-  if (pv.hidden) return;
-  pv.classList.remove("is-open");
-  setTimeout(() => { if (!pv.classList.contains("is-open")) pv.hidden = true; }, 180);
-  if (vault.rowsDirty){
-    vault.rowsDirty = false;
-    setTimeout(renderView, 0);
+    document.title = "Sök | A+ Vault";
+  } else if (vault.view === "live"){
+    parts.live = true;
+    renderLive();
+    setAmbient("/vault-art/live-backdrop.jpg");
+    document.title = "Live | A+ Vault";
+  } else if (vault.view === "min-lista"){
+    parts.results = true;
+    const items = readList().map(slug => findEntryBySlug(manifest, slug)).filter(Boolean);
+    renderResults("Min lista", [{ kind: "poster", items: items }], "Du har inte sparat något än. Tryck på + på en titel så hamnar den här.");
+    document.title = "Min lista | A+ Vault";
+  } else if (vault.view === "genre"){
+    parts.results = true;
+    const group = filmGenres(manifest.titles).find(g => g.slug === vault.genre);
+    renderResults(group ? group.label : "Genre", [{ kind: "poster", items: group ? group.items : [] }], "Inga titlar i den här genren.");
+    if (group) setAmbient(group.items[0].backdrop || group.items[0].poster);
+    document.title = (group ? group.label : "Genre") + " | A+ Vault";
+  } else {
+    const type = vault.view === "serier" ? "series" : vault.view === "filmer" ? "movie" : null;
+    parts.hero = renderHero(vault.view);
+    if (type){
+      parts.results = true;
+      const pool = manifest.titles.filter(t => (t.type === "series") === (type === "series"));
+      renderResults("Alla " + VAULT_VIEWS[vault.view].toLowerCase(), [{ kind: "poster", items: pool }], type === "series" ? "Inga serier i valvet än." : "Inga filmer i valvet än.");
+      document.title = VAULT_VIEWS[vault.view] + " | A+ Vault";
+    } else {
+      parts.rows = true;
+      renderRows();
+      document.title = "A+ Vault";
+    }
   }
+
+  $("vaultHero").hidden = !parts.hero;
+  $("vaultSearchPage").hidden = !parts.search;
+  $("vaultRows").hidden = !parts.rows;
+  $("vaultResults").hidden = !parts.results;
+  $("vaultLive").hidden = !parts.live;
+  if (!parts.hero) stopHero();
+  document.body.classList.toggle("vault-has-hero", !!(parts.hero || parts.live));
 }
 
-function initPreview(){
-  const pv = $("vaultPreview");
-  pv.addEventListener("mouseleave", hidePreview);
-  window.addEventListener("resize", hidePreview);
-  // the pointer can slip off before it ever "enters" the scaling-in preview,
-  // so mouseleave alone would leave it stuck — test against its final box
-  document.addEventListener("mousemove", e => {
-    if (pv.hidden || !pv.classList.contains("is-open")) return;
-    const l = pv.offsetLeft, t = pv.offsetTop;
-    if (e.pageX < l || e.pageX > l + pv.offsetWidth || e.pageY < t || e.pageY > t + pv.offsetHeight) hidePreview();
+/* ---------- routing: /vault?visa=…&genre=…&kategori=…&sok=…&titel=…|live=… ---------- */
+
+function currentParams(){
+  const p = new URLSearchParams();
+  if (vault.view !== "hem") p.set("visa", vault.view);
+  if (vault.view === "genre" && vault.genre) p.set("genre", vault.genre);
+  if (vault.view === "live" && vault.kategori) p.set("kategori", vault.kategori);
+  if (vault.query) p.set("sok", vault.query);
+  if (vault.overlay) p.set(vault.overlay.kind, vault.overlay.key);
+  return p;
+}
+
+function urlForState(){
+  const qs = currentParams().toString();
+  return location.pathname + (qs ? "?" + qs : "");
+}
+
+function applyRoute(){
+  const p = new URLSearchParams(location.search);
+  const view = VAULT_VIEWS[p.get("visa")] ? p.get("visa") : "hem";
+  const kategori = view === "live" ? p.get("kategori") || "" : "";
+  const genre = view === "genre" ? p.get("genre") || "" : "";
+  const query = (p.get("sok") || "").trim();
+  if (!vault.routed || view !== vault.view || kategori !== vault.kategori || genre !== vault.genre || query !== vault.query){
+    vault.routed = true;
+    Object.assign(vault, { view: view, kategori: kategori, genre: genre, query: query });
+    syncSearchInputs();
+    renderView();
+  }
+  const kind = p.get("titel") ? "titel" : p.get("live") ? "live" : null;
+  if (kind) openOverlay(kind, p.get(kind), { fromRoute: true });
+  else if (vault.overlay) hideOverlay();
+}
+
+function navigateTo(target, opts){
+  const wasView = vault.view;
+  vault.view = target.view || "hem";
+  vault.kategori = target.kategori || "";
+  vault.genre = target.genre || "";
+  if (vault.view !== "sok") vault.query = "";
+  syncSearchInputs();
+  history.pushState(null, "", urlForState());
+  renderView();
+  if (!(opts && opts.keepScroll)) window.scrollTo(0, 0);
+  if (vault.view === "sok" && wasView !== "sok") $("vaultSearchBig").focus({ preventScroll: true });
+}
+
+function bindNavLink(a, opts){
+  a.addEventListener("click", e => {
+    if (!isPlainClick(e)) return;
+    e.preventDefault();
+    // tapping the active mobile chip again clears it
+    if (a.closest(".vault-mchips") && a.classList.contains("active")) return navigateTo({ view: "hem" });
+    navigateTo({ view: a.dataset.view, kategori: a.dataset.kategori, genre: a.dataset.genre }, opts);
   });
 }
 
-/* ---------- overlays: title modal (?titel=) and live theater (?live=) ---------- */
+function initNav(){
+  document.querySelectorAll(".vault-nav a[data-view], .vault-tabbar a[data-view], .vault-mchips a[data-view], .vault-logo").forEach(a => bindNavLink(a));
+  const head = $("vaultMHead");
+  const onScroll = () => head.classList.toggle("is-scrolled", window.scrollY > 24);
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+}
+
+/* ---------- overlays: title page (?titel=) and live theater (?live=) ---------- */
 
 const VAULT_OVERLAYS = {
   titel: {
-    root: "vaultModal",
-    card: ".vault-modal-card",
+    root: "vaultDetail",
+    card: ".vault-detail-page",
     find: slug => findEntryBySlug(vault.manifest, slug),
-    fill: entry => fillModal(entry),
+    fill: entry => fillDetail(entry),
     hide: () => {}
   },
   live: {
@@ -1132,8 +1204,6 @@ function openOverlay(kind, key, opts){
   if (!item) return;
   const prev = vault.overlay;
   if (prev && prev.kind === kind && prev.key === key) return;
-  hidePreview();
-  setDrawer(false);
   if (prev && prev.kind !== kind) hideOverlayRoot(prev.kind, true);
 
   vault.overlay = { kind: kind, key: key };
@@ -1149,7 +1219,7 @@ function openOverlay(kind, key, opts){
   if (!prev){
     vault.lastFocus = document.activeElement;
     lockScroll(true);
-    setHeroTrailerPaused(true);
+    holdHero("overlay", true);
   }
 
   const root = $(cfg.root);
@@ -1179,7 +1249,7 @@ function hideOverlayRoot(kind, instant){
   root.classList.remove("is-open");
   cfg.hide();
   if (instant) root.hidden = true;
-  else setTimeout(() => { if (!vault.overlay || vault.overlay.kind !== kind) root.hidden = true; }, 220);
+  else setTimeout(() => { if (!vault.overlay || vault.overlay.kind !== kind) root.hidden = true; }, 260);
 }
 
 function hideOverlay(closing){
@@ -1189,7 +1259,9 @@ function hideOverlay(closing){
   if (!closing) return;
   hideOverlayRoot(closing.kind);
   lockScroll(false);
-  setHeroTrailerPaused(false);
+  holdHero("overlay", false);
+  if (vault.rowsDirty) renderView();
+  else if (hero.slides[hero.index]) setAmbient(hero.slides[hero.index].image);
 
   let focusTarget = vault.lastFocus;
   if (!focusTarget || !document.contains(focusTarget)){
@@ -1217,7 +1289,7 @@ function initOverlays(){
         return;
       }
       if (e.key !== "Tab") return;
-      const focusables = Array.from(root.querySelectorAll("a[href], button:not([disabled]), iframe"))
+      const focusables = Array.from(root.querySelectorAll("a[href], button:not([disabled]), iframe, [tabindex='0']"))
         .filter(n => !n.closest("[hidden]") && n.offsetParent !== null);
       if (!focusables.length) return;
       const first = focusables[0], last = focusables[focusables.length - 1];
@@ -1231,69 +1303,92 @@ function initOverlays(){
       }
     });
   });
+  initTabs();
 }
 
-/* ---------- title modal ---------- */
+/* ---------- title page ---------- */
 
-function fillModal(entry){
+function selectTab(tab){
+  document.querySelectorAll(".vault-tab").forEach(t => {
+    const on = t === tab;
+    t.setAttribute("aria-selected", String(on));
+    t.tabIndex = on ? 0 : -1;
+    $(t.getAttribute("aria-controls")).hidden = !on;
+  });
+}
+
+function initTabs(){
+  const tabs = Array.from(document.querySelectorAll(".vault-tab"));
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => selectTab(tab));
+    tab.addEventListener("keydown", e => {
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      const visible = tabs.filter(t => !t.hidden);
+      const next = visible[(visible.indexOf(tab) + (e.key === "ArrowRight" ? 1 : -1) + visible.length) % visible.length];
+      selectTab(next);
+      next.focus();
+    });
+  });
+}
+
+function fillDetail(entry){
   const progress = readProgress();
   const info = playInfo(entry, true);
   const target = info.target;
   const ep = target.episode;
+  const backdrop = entry.backdrop || entry.poster;
 
-  $("vaultModalKicker").textContent = typeLabel(entry);
-  $("vaultModalTitle").textContent = entry.title;
-  $("vaultModalBg").style.backgroundImage = cssUrl(entry.backdrop || entry.poster);
-  $("vaultModalPlay").href = info.href;
-  $("vaultModalPlayLabel").textContent = info.label;
+  $("vaultDetailBg").style.backgroundImage = cssUrl(backdrop);
+  setAmbient(backdrop);
+  $("vaultDetailBadges").replaceChildren(...titleBadges(entry, true));
+  $("vaultDetailTitle").textContent = entry.title;
+  $("vaultDetailMeta").replaceChildren(...metaSpans(entry));
+  $("vaultDetailPlay").href = info.href;
+  $("vaultDetailPlayLabel").textContent = info.label;
+  $("vaultDetailListSlot").replaceChildren(listButton(entry, "pill"));
 
-  const restart = $("vaultModalRestart");
+  const restart = $("vaultDetailRestart");
   restart.hidden = !target.record;
   restart.href = watchHref(entry, ep, { restart: true });
 
-  $("vaultModalListSlot").replaceChildren(listButton(entry));
-
-  const prog = $("vaultModalProgress");
+  const prog = $("vaultDetailProgress");
   prog.hidden = !target.record;
   if (target.record){
-    $("vaultModalProgressFill").style.width = Math.round(progressRatio(target.record) * 100) + "%";
-    $("vaultModalProgressText").textContent = (ep ? episodeLabel(ep) + " · " : "") + remainingLabel(target.record);
+    $("vaultDetailProgressFill").style.width = Math.round(progressRatio(target.record) * 100) + "%";
+    $("vaultDetailProgressText").textContent = (ep ? episodeLabel(ep) + " · " : "") + remainingLabel(target.record);
   }
+  $("vaultDetailSynopsis").textContent = entry.synopsis || "";
 
-  fillSlate($("vaultModalSlate"), slateCells(entry, true));
-  $("vaultModalSynopsis").textContent = entry.synopsis || "";
+  // Avsnitt
+  const isSeries = entry.type === "series";
+  $("vaultTabEpisodes").hidden = !isSeries;
+  $("vaultDetailEpisodes").replaceChildren(...(isSeries ? entry.episodes.map(item => buildEpisodeItem(entry, item, progress, ep)) : []));
 
-  const epSection = $("vaultModalEpisodes");
-  const epList = $("vaultModalEpisodeList");
-  epList.replaceChildren();
-  if (entry.type === "series"){
-    $("vaultModalEpisodeCount").textContent = String(entry.episodes.length).padStart(2, "0");
-    entry.episodes.forEach(item => epList.append(buildEpisodeItem(entry, item, progress, ep)));
-    epSection.hidden = false;
-  } else {
-    epSection.hidden = true;
-  }
-
+  // Mer som detta
   const similar = similarTitles(entry);
-  $("vaultModalMoreGrid").replaceChildren(...similar.map(buildMoreCard));
-  $("vaultModalMore").hidden = !similar.length;
+  $("vaultDetailMore").replaceChildren(...similar.map(t => buildCard(t)));
+  $("vaultDetailMoreEmpty").hidden = similar.length > 0;
 
-  $("vaultModalAboutHeading").textContent = "Om " + entry.title;
-  const about = $("vaultModalAboutList");
-  about.replaceChildren();
+  // Detaljer
+  const facts = $("vaultDetailFacts");
+  facts.replaceChildren();
   const addFact = (label, value) => {
     if (!value || (Array.isArray(value) && !value.length)) return;
-    about.append(el("div", {}, [
+    facts.append(el("div", {}, [
       el("dt", { text: label }),
       el("dd", { text: Array.isArray(value) ? value.join(", ") : String(value) })
     ]));
   };
-  addFact("Regi", entry.director);
-  addFact("Medverkande", entry.cast);
-  addFact("Genrer", entry.genres);
+  addFact("Titel", entry.title);
   addFact("Typ", typeLabel(entry));
   addFact("År", entry.year);
-  addFact(entry.type === "series" ? "Avsnitt" : "Längd", runtimeLabel(entry));
+  addFact(isSeries ? "Avsnitt" : "Längd", runtimeLabel(entry));
+  addFact("Genrer", entry.genres);
+  addFact("Regi", entry.director);
+  addFact("Medverkande", entry.cast);
+  addFact("Produktion", "A+ Studios, Alingsås");
+
+  selectTab(isSeries ? $("vaultTabEpisodes") : $("vaultTabMore"));
 }
 
 function buildEpisodeItem(entry, ep, progress, currentEp){
@@ -1301,19 +1396,16 @@ function buildEpisodeItem(entry, ep, progress, currentEp){
   const ratio = progressRatio(rec);
   const thumb = el("div", { class: "vault-episode-thumb" }, [
     el("img", { src: ep.poster || entry.poster || "", alt: "", loading: "lazy", decoding: "async" }),
-    el("span", { class: "vault-episode-play", html: ICONS.play })
+    el("span", { class: "vcard-play", html: ICONS.play })
   ]);
   if (ratio > 0) thumb.append(progressBar(ratio));
 
   return el("li", { class: "vault-episode" + (ep === currentEp ? " is-current" : "") }, [
     el("a", { class: "vault-episode-link", href: watchHref(entry, ep), "aria-label": "Spela " + episodeLabel(ep) + ": " + ep.title }, [
-      el("span", { class: "vault-episode-num", text: String(ep.episode).padStart(2, "0") }),
       thumb,
       el("div", { class: "vault-episode-text" }, [
-        el("div", { class: "vault-episode-head" }, [
-          el("span", { class: "vault-episode-title", text: ep.title }),
-          el("span", { class: "vault-episode-duration", text: formatDuration(ep.duration) })
-        ]),
+        el("p", { class: "vault-episode-kicker", text: episodeLabel(ep) + (ep.duration ? " · " + formatDuration(ep.duration) : "") }),
+        el("p", { class: "vault-episode-title", text: ep.title }),
         ep.synopsis ? el("p", { class: "vault-episode-synopsis", text: ep.synopsis }) : null
       ])
     ])
@@ -1330,26 +1422,6 @@ function similarTitles(entry){
     .sort((a, b) => b.score - a.score)
     .slice(0, 6)
     .map(x => x.t);
-}
-
-function buildMoreCard(entry){
-  const art = el("a", { class: "vault-more-art", href: detailHref(entry), "aria-label": "Mer info om " + entry.title }, [
-    el("img", { src: entry.poster || entry.backdrop || "", alt: "", loading: "lazy", decoding: "async" }),
-    el("span", { class: "vault-card-title", text: entry.title }),
-    runtimeLabel(entry) ? el("span", { class: "vault-more-runtime", text: runtimeLabel(entry) }) : null
-  ]);
-  bindOverlayClick(art, "titel", entry.slug);
-
-  return el("div", { class: "vault-more-card" }, [
-    art,
-    el("div", { class: "vault-more-body" }, [
-      el("div", { class: "vault-more-head" }, [
-        el("p", { class: "vault-more-meta", text: [typeLabel(entry), entry.year].filter(Boolean).join(" · ") }),
-        listButton(entry, "vault-round-btn--sm")
-      ]),
-      entry.synopsis ? el("p", { class: "vault-more-synopsis", text: entry.synopsis }) : null
-    ])
-  ]);
 }
 
 /* ---------- live theater ---------- */
@@ -1376,10 +1448,10 @@ function fillTheater(live){
   $("vaultTheaterList").replaceChildren(...others.map(other => {
     const row = el("a", { class: "vault-theater-item", href: liveHref(other) }, [
       el("div", { class: "vault-theater-item-thumb" }, [el("img", { src: liveThumbSrc(other), alt: "", loading: "lazy" })]),
-      el("div", {}, [
-        el("p", { class: "vault-live-title", "data-live-title": other.id, text: liveTitle(other) }),
-        el("p", { class: "vault-live-meta", "data-live-meta": other.id, text: liveMetaLine(other) })
-      ])
+      cardText(liveTitle(other), liveMetaLine(other), {
+        title: { "data-live-title": other.id },
+        meta: { "data-live-meta": other.id }
+      })
     ]);
     bindOverlayClick(row, "live", other.id);
     return row;
@@ -1390,7 +1462,7 @@ function fillTheater(live){
 
 function showEmptyState(){
   $("vaultEmpty").hidden = false;
-  ["vaultHero", "vaultRows", "vaultResults", "vaultLive"].forEach(id => { $(id).hidden = true; });
+  ["vaultHero", "vaultRows", "vaultResults", "vaultLive", "vaultSearchPage"].forEach(id => { $(id).hidden = true; });
 }
 
 async function initVaultPage(){
@@ -1405,8 +1477,7 @@ async function initVaultPage(){
 
   initNav();
   initSearch();
-  initHeroTrailer();
-  initPreview();
+  initHero();
   initOverlays();
   renderSideCategories();
   applyRoute();
@@ -1420,7 +1491,7 @@ async function initVaultPage(){
     renderView();
     if (vault.overlay && vault.overlay.kind === "titel"){
       const open = findEntryBySlug(manifest, vault.overlay.key);
-      if (open) fillModal(open);
+      if (open) fillDetail(open);
     }
   };
   window.addEventListener("pageshow", e => { if (e.persisted) refresh(); });

@@ -8,8 +8,7 @@
 <title>Spelar upp | A+ Vault</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=Archivo+Black&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/vault.css">
 </head>
 <body class="vault-body vault-watch">
@@ -68,11 +67,11 @@
       <p class="player-end-kicker">Du har sett klart</p>
       <h2 id="playerEndTitle"></h2>
       <div class="player-end-actions">
-        <button type="button" class="vault-btn vault-btn-play" id="playerReplay">
+        <button type="button" class="vault-btn vault-btn--primary" id="playerReplay">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.5-5.8"/><path d="M4 4v4.5h4.5"/></svg>
           <span>Se igen</span>
         </button>
-        <a href="/vault" class="vault-btn vault-btn-info" id="playerEndBack">Tillbaka till Vault</a>
+        <a href="/vault" class="vault-btn vault-btn--glass" id="playerEndBack">Tillbaka till Vault</a>
       </div>
       <div class="player-end-more" id="playerEndMore" hidden>
         <p class="player-end-more-heading">Mer från A+</p>
@@ -168,7 +167,7 @@
   <div class="player-error" id="playerError" hidden>
     <p class="player-error-kicker">Något gick fel</p>
     <h1 id="playerErrorTitle">Videon kunde inte spelas upp.</h1>
-    <a href="/vault" class="vault-btn vault-btn-play">Tillbaka till Vault</a>
+    <a href="/vault" class="vault-btn vault-btn--primary">Tillbaka till Vault</a>
   </div>
 </div>
 
